@@ -28,14 +28,16 @@ const getAllUsers = async (req, res) => {
 
 // registering user
 const register = async (req, res) => {
+    const client = await db.connect(); // explicitly acquire connection for multiple queries
     try {
+        await client.query("BEGIN");
+
         const email = req.body.email;
-        const profile_name = req.body.email.split("@")[0];
-        const role = req.body.role || "user"
+        const role = req.body.role || "user";
         // console.log(email, profile_name);
 
         // check for duplicate
-        const auth = await db.query(
+        const auth = await client.query(
             "SELECT COUNT(*) FROM user_profiles WHERE email = $1;",
             [email]
         );
@@ -43,21 +45,41 @@ const register = async (req, res) => {
         const auth_count = parseInt(auth.rows[0].count);
 
         if (auth_count > 0) {
+            await client.query("ROLLBACK"); // rollback if duplicate found
             return res
                 .status(400)
                 .json({ status: "error", msg: "duplicate email" });
         }
 
         const hash = await bcrypt.hash(req.body.password, 12);
-        await db.query(
-            "INSERT INTO user_profiles(email, hashed_password, profile_name, role) VALUES ($1, $2, $3, $4);",
+
+        // Insert user_profile into user_profiles table
+        const userResult = await client.query(
+            "INSERT INTO user_profiles(email, hashed_password, profile_name, role) VALUES ($1, $2, $3, $4) RETURNING id;",
             [email, hash, profile_name, role]
         );
+        console.log(userResult.rows)
+
+        if (userResult.rows.length === 0) {
+            await client.query("ROLLBACK");
+            return res.status(400).json({status: "error", msg: "id not found!"})
+        }
+
+        // Insert into admin_user_data using the same client
+        await client.query(
+            "INSERT INTO admin_user_data(user_id, is_active) VALUES ($1, $2);",
+            [userResult.rows[0].id, true]
+        );
+
+        await client.query("COMMIT"); //commit the transaction
 
         res.status(200).json({ status: "ok", msg: "user created" });
     } catch (error) {
+        await client.query("ROLLBACK"); // Rollback on error
         console.error(error.message);
         res.status(400).json({ status: "error", msg: "invalid registration" });
+    } finally {
+        client.release();
     }
 };
 
@@ -68,7 +90,12 @@ const login = async (req, res) => {
         const password = req.body.password;
 
         const auth = await db.query(
-            "SELECT * FROM user_profiles WHERE email = $1;",
+            `SELECT *
+            FROM user_profiles
+            JOIN admin_user_data 
+                ON user_profiles.id = admin_user_data.user_id 
+            WHERE is_active = true      
+            AND email = $1;`,
             [email]
         );
 
@@ -121,10 +148,7 @@ const refresh = async (req, res) => {
     try {
         const refresh = req.body.refresh;
 
-        const decoded = jwt.verify(
-            refresh,
-            process.env.REFRESH_SECRET
-        );
+        const decoded = jwt.verify(refresh, process.env.REFRESH_SECRET);
 
         const claims = {
             email: decoded.email,
@@ -136,7 +160,7 @@ const refresh = async (req, res) => {
             jwtid: uuidv4(),
         });
 
-        console.log(access)
+        console.log(access);
         res.json({ access });
     } catch (error) {
         console.error(error.message);
