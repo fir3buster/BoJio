@@ -5,7 +5,7 @@ const database = require("../db/db");
 
 const db = database.pool;
 
-// getting allUsers profile
+// getting allUsers profile only admin
 const getAllUsers = async (req, res) => {
     try {
         console.log("inside Controller");
@@ -58,11 +58,13 @@ const register = async (req, res) => {
             "INSERT INTO user_profiles(email, hashed_password, profile_name, role) VALUES ($1, $2, $3, $4) RETURNING id;",
             [email, hash, profile_name, role]
         );
-        console.log(userResult.rows)
+        console.log(userResult.rows);
 
         if (userResult.rows.length === 0) {
             await client.query("ROLLBACK");
-            return res.status(400).json({status: "error", msg: "id not found!"})
+            return res
+                .status(400)
+                .json({ status: "error", msg: "id not found!" });
         }
 
         // Insert into admin_user_data using the same client
@@ -85,6 +87,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
+        console.log("inside login controller");
         // check if email already registered
         const email = req.body.email;
         const password = req.body.password;
@@ -99,9 +102,11 @@ const login = async (req, res) => {
             [email]
         );
 
+        console.log(auth.rows);
         if (auth.rows.length === 0) {
+            console.log("in if statement");
             return (
-                res.status(400),
+                res.status(400).
                 json({ status: "error", msg: "not authorized" })
             );
         }

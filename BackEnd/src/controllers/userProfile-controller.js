@@ -45,56 +45,71 @@ const updateUserProfile = async (req, res) => {
     try {
         await client.query("BEGIN");
 
-        const userId = req.params.id;
+        const id = req.params.id;
         const updatedFields = [];
         const updatedParams = [];
+        let placeholderCount = 0;
 
         // check if specific fields are provided in the request body
-        // if ("email" in req.body) {
-        //     updatedFields.push("email=$1")
-        //     updatedParams.push(req.body.email)
-        // }
+        if ("email" in req.body) {
+            placeholderCount++;
+            updatedFields.push(`email=$${placeholderCount}`);
+            updatedParams.push(req.body.email);
+        }
 
         if ("profile_name" in req.body) {
-            updatedFields.push("profile_name=$2");
+            placeholderCount++;
+            updatedFields.push(`profile_name=$${placeholderCount}`);
             updatedParams.push(req.body.profile_name);
         }
 
         if ("first_name" in req.body) {
-            updatedFields.push("first_name=$3");
+            placeholderCount++;
+            updatedFields.push(`first_name=$${placeholderCount}`);
             updatedParams.push(req.body.first_name);
         }
 
         if ("last_name" in req.body) {
-            updatedFields.push("last_name=$4");
+            placeholderCount++;
+            updatedFields.push(`last_name=$${placeholderCount}`);
             updatedParams.push(req.body.last_name);
         }
 
-        if ("profile_pic_url" in req.body) {
-            updatedFields.push("profile_pic_url=$5");
+        if ("profile_picture_url" in req.body) {
+            placeholderCount++;
+            updatedFields.push(`profile_picture_url=$${placeholderCount}`);
             updatedParams.push(req.body.profile_picture_url);
         }
 
         if ("bio" in req.body) {
-            updatedFields.push("bio=$6");
+            placeholderCount++;
+            updatedFields.push(`bio=$${placeholderCount}`);
             updatedParams.push(req.body.bio);
         }
 
         if ("gender" in req.body) {
-            updatedFields.push("gender=$7");
+            placeholderCount++;
+            updatedFields.push(`gender=$${placeholderCount}`);
             updatedParams.push(req.body.gender);
         }
 
+        if (updatedFields.length === 0) {
+            await client.query("ROLLBACK");
+            return res
+                .status(400)
+                .json({ status: "error", msg: "no fields to update" });
+        }
         // add the id parameter to the list
-        updatedParams.push(userId);
+        placeholderCount++;
+        updatedParams.push(id);
 
         // Join the updates into a single string, separated by commas
         const updatedFieldsQuery = updatedFields.join(", ");
 
         // // Execute the SQL query with parameterized inputs
         await client.query(
-            `UPDATE user_profiles SET ${updatedFieldsQuery} WHERE id = $8;`,
-            [updatedParams]
+            `UPDATE user_profiles SET ${updatedFieldsQuery} WHERE id = $${placeholderCount};`,
+            updatedParams
         );
 
         await client.query("COMMIT");
@@ -113,16 +128,27 @@ const updateUserProfile = async (req, res) => {
 };
 
 // --------------------------------FOLLOWERS-----------------------------------------------------
-// getting all followee by id (getting all the people that user is following)
+// getting all following by id (getting all the people that user is following)
 const getFollowingUsersById = async (req, res) => {
     try {
-        const userId = req.params.id;
+        const id = req.params.id;
 
-        const followingUsers = await db.query(
-            "SELECT * FROM user_profiles WHERE follower_id = $1;",
-            [userId]
+        const following = await db.query(
+            `SELECT following_id, user_profiles.*, admin_user_data.is_active
+            FROM 
+                user_followers
+                INNER JOIN admin_user_data
+                    ON admin_user_data.user_id = user_followers.following_id
+                INNER JOIN user_profiles
+                    ON user_profiles.id = user_followers.following_id
+            WHERE 
+                user_followers.follower_id = $1
+                AND user_followers.is_active = true
+                AND admin_user_data.is_active = true;`,
+            [id]
         );
-        res.status(200).json(followingUsers.rows);
+
+        res.status(200).json(following.rows);
     } catch (error) {
         console.error(error.message);
         res.status(400).json({
@@ -132,15 +158,26 @@ const getFollowingUsersById = async (req, res) => {
     }
 };
 
-// getting all followers by id (getting all the people is following the user)
+// getting all followers by id (getting all the people that user is followed by)
 const getFollowersById = async (req, res) => {
     try {
-        const userId = req.params.id;
+        const id = req.params.id;
 
         const followers = await db.query(
-            "SELECT * FROM user_profiles WHERE followee_id = $1;",
-            [userId]
+            `SELECT follower_id, user_profiles.*, admin_user_data.is_active
+            FROM 
+                user_followers
+                INNER JOIN admin_user_data
+                    ON admin_user_data.user_id = user_followers.follower_id
+                INNER JOIN user_profiles
+                    ON user_profiles.id = user_followers.follower_id
+            WHERE 
+                user_followers.following_id = $1
+                AND user_followers.is_active = true
+                AND admin_user_data.is_active = true;`,
+            [id]
         );
+
         res.status(200).json(followers.rows);
     } catch (error) {
         console.error(error.message);
@@ -155,30 +192,31 @@ const getFollowersById = async (req, res) => {
 const updateFollower = async (req, res) => {
     const client = await db.connect();
     try {
+        console.log("inside updatefollower");
         await client.query("BEGIN");
 
-        const userId = req.body.followee_id;
+        const followingId = req.body.following_id;
         const followerId = req.body.follower_id;
 
         //check if already in database
         const data = await client.query(
-            `SELECT * FROM user_followers WHERE followee_id=$1 AND follower_id=$2 RETURNING is_active;`,
-            [userId, followerId]
+            `SELECT * FROM user_followers WHERE following_id=$1 AND follower_id=$2;`,
+            [followingId, followerId]
         );
 
         console.log(data.rows);
         if (data.rows.length === 0) {
             console.log("new user_follower data");
             await client.query(
-                `INSERT INTO user_followers(followee_id, follower_id) VALUES ($1, $2);`,
-                [userId, followerId]
+                `INSERT INTO user_followers(following_id, follower_id) VALUES ($1, $2);`,
+                [followingId, followerId]
             );
         } else if (data.rows.length === 1) {
-            const newIsActive = "";
+            let newIsActive = "";
             console.log("to update user_follower data");
-            if (data.rows[0].is_active === "true") {
+            if (data.rows[0].is_active === true) {
                 newIsActive = false;
-            } else if (data.rows[0].is_active === "false") {
+            } else if (data.rows[0].is_active === false) {
                 newIsActive = true;
             } else {
                 await client.query("ROLLBACK");
@@ -189,8 +227,8 @@ const updateFollower = async (req, res) => {
                 });
             }
             await client.query(
-                `UPDATE user_followers SET is_active=$1 WHERE followee_id = $2 and following_id = $3;`,
-                [newIsActive, userId, followerId]
+                `UPDATE user_followers SET is_active=$1 WHERE following_id = $2 and follower_id = $3;`,
+                [newIsActive, followingId, followerId]
             );
         } else {
             await client.query("ROLLBACK");
@@ -221,81 +259,110 @@ const updateFollower = async (req, res) => {
 
 // --------------------------------SPORTS CARD----------------------------------------------
 /*
-NTRP RATING = 0.0 - 2.0 (beginner)
+NTRP RATING = 1.0 - 2.0 (beginner)
 NTRP RATING = 2.5 - 4.0 (intermediate)
 NTRP RATING = 4.5 - 5.5 (advanced)
 NTRP RATING = 6.0 - 7.0 (professional)
 */
 
 // get sports card based on user
-const getSportsCardsById = async (req, res) => {
+const getAllSportsCardsByUserId = async (req, res) => {
     try {
-        const userId = req.params.id;
+        const userId = req.params.user_id;
 
-        const sportsCards = await db.query("SELECT * FROM sports_cards WHERE user_id = $1;", [userId])
+        const sportsCards = await db.query(
+            "SELECT * FROM sports_cards WHERE user_id = $1;",
+            [userId]
+        );
 
-        res.status(200).json(sportsCards.rows)
+        res.status(200).json(sportsCards.rows);
     } catch (error) {
-        console.error(error.message)
-        res.status(400).json({status: "error", msg: "error getting sports cards"})
+        console.error(error.message);
+        res.status(400).json({
+            status: "error",
+            msg: "error getting sports cards",
+        });
     }
-}
+};
 
 // creating sport card based on user
-const addSportCardById = async (req, res) => {
+const addSportCard = async (req, res) => {
     try {
-        const userId = req.params.id;
+        const userId = req.body.user_id;
         const sportType = req.body.sport_type;
-        const skillLevel = req.body.skill_level;
-        const skillRate = req.body.skill_rate;
-
+        const skillLevel = req.body.skill_level || 'beginner';
+        const skillRate = req.body.skill_rate || 'unrated';
+        
         await db.query(
-            `INSERT INTO sports_cards (user id, sport_type, skill_level, skill_rate ) VALUES ($1, $2, $3, $4);`,
+            `INSERT INTO sports_cards (user_id, sport_type, skill_level, skill_rate ) VALUES ($1, $2, $3, $4);`,
             [userId, sportType, skillLevel, skillRate]
         );
 
-        res.status(200).json({status: "ok", msg: "add sport card successfully"})
+        res.status(200).json({
+            status: "ok",
+            msg: "add sport card successfully",
+        });
     } catch (error) {
-        console.error(error.message)
-        res.status(400).json({status: "error", msg: "error creating sport card"})
+        console.error(error.message);
+        res.status(400).json({
+            status: "error",
+            msg: "error creating sport card",
+        });
     }
-}
-
+};
 
 // update sport card based on user
 const updateSportCardById = async (req, res) => {
-    const client = await db.connect()
+    const client = await db.connect();
     try {
         await client.query("BEGIN");
 
-        const userId = req.params.Id;
+        const id = req.params.id;
         const sportType = req.body.sport_type;
 
         // check if sport card is in database
-        const sportCard = await client.query("SELECT * FROM sports_cards WHERE user_id = $1 AND sport_type = $2 ;", [userId, sportType])
+        const sportCard = await client.query(
+            `SELECT * FROM sports_cards WHERE id = $1 AND sport_type = $2 ;`,
+            [id, sportType]
+        );
+
+        console.log(sportCard.rows)
 
         if (sportCard.rows.length === 0) {
             await client.query("ROLLBACK");
-            console.log("not sport card found")
-            return res.status(400).json({status: "error", msg: "no sport card found"})
+            console.log("no sport card found");
+            return res
+                .status(400)
+                .json({ status: "error", msg: "no sport card found" });
         }
 
         const updatedFields = [];
         const updatedParams = [];
 
-        if ("sport_level" in req.body) {
-            updatedFields.push("sport_level=$1")
-            updatedParams.push(req.body.sport_level)
+        let placeholderCount = 0;
+
+        // check if specific fields are provided in the request body
+        if ("skill_level" in req.body) {
+            placeholderCount++;
+            updatedFields.push(`skill_level=$${placeholderCount}`);
+            updatedParams.push(req.body.skill_level);
         }
 
-        if ("sport_rate" in req.body) {
-            updatedFields.push("sport_rate=$2")
-            updatedParams.push(req.body.sport_rate)
+        if ("skill_rate" in req.body) {
+            placeholderCount++;
+            updatedFields.push(`skill_rate=$${placeholderCount}`);
+            updatedParams.push(req.body.skill_rate);
+        }
+
+        if ("user_id" in req.body) {
+            placeholderCount++;
+            updatedFields.push(`user_id=$${placeholderCount}`);
+            updatedParams.push(req.body.user_id);
         }
 
         // add the id parameter to the list
-        updatedParams.push(userId);
-        updatedParams.push(sportType)
+        placeholderCount++;
+        updatedParams.push(id);
 
 
         // Join the updates into a single string, separated by commas
@@ -303,29 +370,32 @@ const updateSportCardById = async (req, res) => {
 
         // // Execute the SQL query with parameterized inputs
         await client.query(
-            `UPDATE sports_cards SET ${updatedFieldsQuery} WHERE user_id = $3 AND sport_type = $4;`,
-            [updatedParams]
+            `UPDATE sports_cards SET ${updatedFieldsQuery} WHERE id=$${placeholderCount};`,
+            updatedParams
         );
 
         await client.query("COMMIT");
 
         res.json({ status: "ok", msg: "sport card updated successfully" });
     } catch (error) {
-        await client.query("ROLLBACK")
-        console.error(error.message)
-        res.status(400).json({status: "error", msg: "error updating sport card"})
+        await client.query("ROLLBACK");
+        console.error(error.message);
+        res.status(400).json({
+            status: "error",
+            msg: "error updating sport card",
+        });
     } finally {
-        client.release()
+        client.release();
     }
-}
+};
 
 //-------------------------------- ADMIN ---------------------------------------------------
 // admin activate/deactivate user account
 const manageUserAccountById = async (req, res) => {
     try {
-        const userId = req.params.id;
-        const updatedField = "";
-        const isActiveParam = "";
+        const id = req.params.id;
+        let updatedField = "";
+        let isActiveParam = "";
 
         if ("is_active" in req.body) {
             updatedField = "is_active=$1";
@@ -334,7 +404,7 @@ const manageUserAccountById = async (req, res) => {
 
         await db.query(
             `UPDATE admin_user_data SET ${updatedField} WHERE user_id = $2;`,
-            [isActiveParam, userId]
+            [isActiveParam, id]
         );
 
         res.status(200).json({
@@ -358,7 +428,7 @@ module.exports = {
     getFollowingUsersById,
     getFollowersById,
     updateFollower,
-    getSportsCardsById,
-    addSportCardById,
+    getAllSportsCardsByUserId,
+    addSportCard,
     updateSportCardById,
 };
