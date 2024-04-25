@@ -4,7 +4,7 @@ CREATE TABLE user_profiles (
     id SERIAL PRIMARY KEY, 
     email VARCHAR(50) NOT NULL UNIQUE, 
     hashed_password VARCHAR(255) NOT NULL, 
-    profile_name VARCHAR(30) NOT NULL, 
+    profile_name VARCHAR(30), 
     first_name VARCHAR(30), 
     last_name VARCHAR(30), 
     profile_picture_url VARCHAR(255), 
@@ -14,11 +14,18 @@ CREATE TABLE user_profiles (
     create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE admin_user_data (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT 'true',
+    FOREIGN KEY(user_id) REFERENCES user_profiles(id)
+);
+
 CREATE TABLE user_followers (
     id SERIAL PRIMARY KEY,
     followee_id INT NOT NULL,
     follower_id INT NOT NULL,
-    isActive BOOLEAN NOT NULL DEFAULT 'true',
+    is_active BOOLEAN NOT NULL DEFAULT 'true',
     FOREIGN KEY (followee_id) REFERENCES user_profiles(id),
     FOREIGN KEY (follower_id) REFERENCES user_profiles(id)
 );
