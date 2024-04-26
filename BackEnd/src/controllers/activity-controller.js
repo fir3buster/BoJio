@@ -2,19 +2,47 @@ const database = require("../db/db");
 
 const db = database.pool;
 
-//-----------------------------------------USER PROFILE--------------------------------------------
-
-// getting all upcoming public activities
+// ---------------------------------------------------- Activities ----------------------------------------------------------
+// getting all public activities (include all players that is invited where is_active = true))
 const getAllPublicActivities = async (req, res) => {
     try {
         console.log("inside public Controller");
         const now = new Date();
         const activities = await db.query(
-            `SELECT * 
-            FROM activities 
-            WHERE game_private = FALSE
-            AND schedule > $1 
-            ORDER BY schedule;`,
+            `SELECT
+                a.id,
+                a.user_id,
+                a.title,
+                a.schedule,
+                a.location,
+                a.sport_type,
+                a.game_type,
+                a.skill_level,
+                a.game_private,
+                ARRAY_AGG (
+                    JSON_BUILD_OBJECT (
+                        'user_id', aud.user_id,
+                        'is_going', aud.is_going,
+                        'is_active', aud.is_active       
+                    )
+                    ORDER BY
+                        CASE
+                            WHEN aud.user_id = a.user_id THEN 0
+                            ELSE 1
+                        END
+                ) AS players
+            FROM
+                activities a
+            LEFT JOIN
+                activity_user_decisions aud
+            ON
+                a.id = aud.activity_id
+            WHERE
+                a.game_private = FALSE
+                AND a.schedule > $1
+                AND aud.is_active = TRUE
+            GROUP BY
+                a.id;`,
             [now]
         );
         console.log(activities.rows, typeof activities.rows);
@@ -28,13 +56,34 @@ const getAllPublicActivities = async (req, res) => {
     }
 };
 
-// getting activity by id
-const getActivityById = async (req, res) => {
+// getting upcoming activity by id (include all players that is invited where is_active = true))
+const getUpcomingActivitiesByUserId = async (req, res) => {
+    const client = await db.connect();
     try {
-        const id = req.params.id;
-        const activity = await db.query(
-            `SELECT 
+        await client.query("BEGIN");
+        const now = new Date();
+        const userId = req.params.user_id;
+
+        const activitiesId = await client.query(
+            `SELECT activity_id FROM activity_user_decisions WHERE user_id = $1 AND is_active = TRUE;`,
+            [userId]
+        );
+
+        if (activitiesId.rows.length === 0) {
+            await client.query("ROLLBACK");
+            console.log("no activities");
+            return res
+                .status(400)
+                .json({ status: "error", msg: "error getting activities" });
+        }
+
+        const ids = activitiesId.rows.map((item) => item.activity_id);
+        console.log(ids);
+
+        const activities = await client.query(
+            `SELECT
                 a.id,
+                a.user_id,
                 a.title,
                 a.schedule,
                 a.location,
@@ -42,41 +91,189 @@ const getActivityById = async (req, res) => {
                 a.game_type,
                 a.skill_level,
                 a.game_private,
-                aud.user_id AS player_id,
-                aud.is_going AS player_is_going
-            FROM activities a
-            LEFT JOIN activity_user_decisions aud
-                ON a.id = aud.activity_id
-            WHERE a.id = $1
-            AND aud.is_active = TRUE;`,
+                ARRAY_AGG (
+                    JSON_BUILD_OBJECT (
+                        'user_id', aud.user_id,
+                        'is_going', aud.is_going,
+                        'is_active', aud.is_active       
+                    )
+                    ORDER BY
+                        CASE
+                            WHEN aud.user_id = a.user_id THEN 0
+                            ELSE 1
+                        END
+                ) AS players
+            FROM
+                activities a
+            LEFT JOIN
+                activity_user_decisions aud
+            ON
+                a.id = aud.activity_id
+            WHERE
+                a.id = ANY($1)
+                AND a.schedule > $2
+                AND aud.is_active = TRUE
+            GROUP BY
+                a.id;`,
+            [ids, now]
+        );
+
+        await client.query("COMMIT");
+
+        console.log(activities.rows, typeof activities.rows);
+        res.status(200).json(activities.rows);
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.error(error.message);
+        res.status(400).json({
+            status: "error",
+            msg: "error getting activities",
+        });
+    } finally {
+        client.release();
+    }
+};
+
+// getting upcoming activity by id (include all players that is invited where is_active = true)
+const getPastActivitiesByUserId = async (req, res) => {
+    const client = await db.connect();
+    try {
+        await client.query("BEGIN");
+        const now = new Date();
+        const userId = req.params.user_id;
+
+        const activitiesId = await client.query(
+            `SELECT activity_id FROM activity_user_decisions WHERE user_id = $1 AND is_active = TRUE;`,
+            [userId]
+        );
+
+        if (activitiesId.rows.length === 0) {
+            await client.query("ROLLBACK");
+            console.log("no activities");
+            return res
+                .status(400)
+                .json({ status: "error", msg: "error getting activities" });
+        }
+
+        const ids = activitiesId.rows.map((item) => item.activity_id);
+        console.log(ids);
+
+        const activities = await client.query(
+            `SELECT
+                a.id,
+                a.user_id,
+                a.title,
+                a.schedule,
+                a.location,
+                a.sport_type,
+                a.game_type,
+                a.skill_level,
+                a.game_private,
+                ARRAY_AGG (
+                    JSON_BUILD_OBJECT (
+                        'user_id', aud.user_id,
+                        'is_going', aud.is_going,
+                        'is_active', aud.is_active       
+                    )
+                    ORDER BY
+                        CASE
+                            WHEN aud.user_id = a.user_id THEN 0
+                            ELSE 1
+                        END
+                ) AS players
+            FROM
+                activities a
+            LEFT JOIN
+                activity_user_decisions aud
+            ON
+                a.id = aud.activity_id
+            WHERE
+                a.id = ANY($1)
+                AND a.schedule < $2
+                AND aud.is_active = TRUE
+            GROUP BY
+                a.id;`,
+            [ids, now]
+        );
+
+        await client.query("COMMIT");
+
+        console.log(activities.rows, typeof activities.rows);
+        res.status(200).json(activities.rows);
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.error(error.message);
+        res.status(400).json({
+            status: "error",
+            msg: "error getting activities",
+        });
+    } finally {
+        client.release();
+    }
+};
+
+// getting activity by id (include all players)
+const getActivityById = async (req, res) => {
+    const client = await db.connect();
+    try {
+        await client.query("BEGIN");
+        const id = req.params.id;
+        const activity = await client.query(
+            `SELECT * FROM activities WHERE id = $1;`,
             [id]
         );
 
-        res.status(200).json(activity.rows);
+        if (activity.rows.length === 0) {
+            await client.query("ROLLBACK");
+            console.log("no activity found");
+            res.status(400).json({ status: "error", msg: "no activity found" });
+        }
+
+        const players = await client.query(
+            `SELECT * FROM activity_user_decisions WHERE activity_id = $1 AND is_active = TRUE
+            ORDER BY
+                CASE
+                    WHEN user_id = $2 then 0
+                    ELSE 1
+                END;`,
+            [id, activity.rows[0].user_id]
+        );
+
+        await client.query("COMMIT");
+        console.log(players.rows[0]);
+        const activityArray = activity.rows[0];
+        const playersArray = players.rows;
+        const activityWithPlayers = [{ ...activityArray, playersArray }];
+
+        console.log(activityWithPlayers, typeof activityWithPlayers);
+        res.status(200).json(activityWithPlayers);
     } catch (error) {
+        await client.query("ROLLBACK"); // Rollback on error
         console.error(error.message);
         res.status(400).json({
             status: "error",
             msg: "error getting activity",
         });
+    } finally {
+        client.release();
     }
 };
 
 const addActivity = async (req, res) => {
-    const client = await client.connect();
+    const client = await db.connect();
     try {
         await client.query("BEGIN");
 
         const userId = req.body.user_id;
         const sportType = req.body.sport_type || "tennis";
         const gameType = req.body.game_type || "singles";
-        const title = req.body.title || `${userId} ${gameType}`;
+        const title = req.body.title || `${gameType}`;
         const schedule = req.body.schedule;
         const location = req.body.location;
         const minPeople = req.body.min_people || 2;
         const maxPeople = req.body.max_people || 2;
         const skillLevel = req.body.skill_level || 1.0;
-        const gamePrivate = req.body.game_private || FALSE;
+        const gamePrivate = req.body.game_private || false;
 
         const activityResult = await client.query(
             `INSERT INTO activities(user_id, sport_type, game_type, title, schedule, location, min_people, max_people, skill_level, game_private) 
@@ -106,7 +303,7 @@ const addActivity = async (req, res) => {
         // insert into activity_user_decision using the same activity id
         await client.query(
             "INSERT INTO activity_user_decisions (activity_id, user_id, is_going) VALUES ($1, $2, $3);",
-            [activityResult.rows[0].id, userId, TRUE]
+            [activityResult.rows[0].id, userId, true]
         );
 
         await client.query("COMMIT");
@@ -219,6 +416,13 @@ const deleteActivityById = async (req, res) => {
     try {
         const id = req.params.id;
 
+        // Check if the record exists before attempting to delete
+        const checkResult = await db.query("SELECT * FROM activities WHERE id = $1;", [id]);
+
+        if (checkResult.rowCount === 0) {
+            return res.status(404).json({ status: "error", msg: "activity not found" });
+        }
+
         await db.query("DELETE FROM activities WHERE id = $1;", [id]);
 
         res.status(200).json({ status: "ok", msg: "activity deleted" });
@@ -228,10 +432,100 @@ const deleteActivityById = async (req, res) => {
     }
 };
 
+// ---------------------------------------------------- player ----------------------------------------------------------
+// add a player to the game
+const addPlayer = async (req, res) => {
+    try {
+        const activityId = req.body.activity_id;
+        const userId = req.body.user_id;
+        const isGoing = req.body.is_going || false;
+        const isActive = req.body.is_active || true;
+
+        await db.query(
+            `INSERT INTO activity_user_decisions (activity_id, user_id, is_going, is_active) VALUES ($1, $2, $3, $4);`,
+            [activityId, userId, isGoing, isActive]
+        );
+
+        res.status(200).json({
+            status: "ok",
+            msg: "add player to activity successfully"
+        });
+    } catch (error) {
+        console.error(error.message);
+        res.status(400).json({status: "error", msg: "error creating player to activity"})
+    }
+};
+
+// update players status (either join or left)
+const updatePlayerStatusById = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const updatedFields = [];
+        const updatedParams = [];
+        let placeholderCount = 0;
+        if ("is_going" in req.body) {
+            placeholderCount++;
+            updatedFields.push(`is_going=$${placeholderCount}`);
+            updatedParams.push(req.body.is_going);
+        }
+
+        if ("is_active" in req.body) {
+            placeholderCount++;
+            updatedFields.push(`is_active=$${placeholderCount}`);
+            updatedParams.push(req.body.is_active);
+        }
+
+        if (updatedFields.length === 0) {
+            return res.status(400).json({status: "error", msg: "no fields to update"})
+        }
+
+        placeholderCount++;
+        updatedParams.push(id);
+
+        const updatedFieldsQuery = updatedFields.join(", ");
+
+        await db.query(
+            `UPDATE activity_user_decisions SET ${updatedFieldsQuery} WHERE id = $${placeholderCount};`,
+            updatedParams
+        )
+
+        res.json({status: "ok", msg: "player status updated successfully"})
+    } catch (error) {
+        console.error(error.message);
+        res.status(400).json({status: "error", msg: "error updating player's status"})
+    }
+};
+
+// delete player when he left the game
+const deletePlayerById = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        // Check if the record exists before attempting to delete
+        const checkResult = await db.query("SELECT * FROM activity_user_decisions WHERE id = $1;", [id]);
+
+        if (checkResult.rowCount === 0) {
+            return res.status(404).json({ status: "error", msg: "Player not found" });
+        }
+
+        await db.query("DELETE FROM activity_user_decisions WHERE id = $1;", [id]);
+
+        res.status(200).json({ status: "ok", msg: "player deleted" });
+    } catch (error) {
+        console.error(error.message);
+        res.status(400).json({ status: "ok", msg: "error deleting player" });
+    }
+}
+
 module.exports = {
     getAllPublicActivities,
+    getUpcomingActivitiesByUserId,
+    getPastActivitiesByUserId,
     getActivityById,
     addActivity,
     updateActivityById,
     deleteActivityById,
+    addPlayer,
+    updatePlayerStatusById,
+    deletePlayerById,
 };
