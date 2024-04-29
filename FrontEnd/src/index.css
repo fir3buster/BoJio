@@ -1,4 +1,4 @@
-:root {
+/* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -65,4 +65,100 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */
+
+
+
+* {
+    box-sizing: border-box;
+  }
+  
+  html {
+    font-family: "Oxygen", sans-serif;
+  }
+  
+  body {
+    margin: 0;
+    background-color: #1a1a1a;
+    color: black;
+  }
+  
+  /* .centered {
+    margin: 3rem auto;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  } */
+  
+  .chartandbuttons {
+    left: 300px;
+  }
+  
+  .header {
+    height: 100px;
+    background-color: black;
+  }
+  
+  .logo {
+    width: 500px;
+    margin: 50px;
+  }
+  
+  .login {
+    text-align: center;
+  }
+  
+  .email {
+    width: 500px;
+    margin: 10px;
+    border-radius: 3px;
+    height: 40px;
+  }
+  
+  .password {
+    width: 500px;
+    border-radius: 3px;
+    height: 40px;
+  }
+
+  .firstLastName {
+    display: inline-block;
+  }
+
+  .firstName,
+  .lastName {
+    margin-right: 5px;
+    width: 175px;
+    border-radius: 3px;
+    height: 40px;
+  }
+
+  .loginButton {
+    width: 500px;
+    margin: 30px;
+    height: 40px;
+    border-radius: 30px;
+    border: none;
+    background-color: #01c187;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+  }
+  
+  .goToRegisterButton {
+    background-color: #1a1a1a;
+    color: white;
+    cursor: pointer;
+    border: none;
+    font-size: 20px;
+    border-bottom: 1px solid white;
+  }
+  
+  .selection {
+    width: 175px;
+    height: 40px;
+    margin-top: 10px;
+    border-radius: 3px;
+  }
+  
