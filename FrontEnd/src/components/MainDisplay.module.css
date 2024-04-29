@@ -1,0 +1,31 @@
+/* .container {
+    margin: 0 auto;
+    width: 60%;
+    height: 700px;
+    background-color: gray;
+    justify-content: center;
+    align-items: center;
+} */
+
+.container {
+    display: grid;
+    grid-template-columns: 30% 40% 30%; /* Adjust column widths */
+    height: 100vh; /* Occupy the full height of the viewport */
+    padding: 0;
+    margin: 0;
+}
+
+.left-col {
+    background-color: whitesmoke;
+    height: 100%;
+}
+
+.center-col {
+    background-color: gray; 
+    padding: 2rem; 
+    overflow-y: auto;
+}
+
+.right-col {
+    background-color: transparent; 
+}
