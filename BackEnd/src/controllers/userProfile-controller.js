@@ -12,7 +12,9 @@ const getAllActiveUsers = async (req, res) => {
             `SELECT *
             FROM user_profiles
             JOIN admin_user_data 
-                ON user_profiles.id = admin_user_data.user_id 
+                ON user_profiles.id = admin_user_data.user_id
+            JOIN sports_cards
+                ON user_profiles.id = sports_cards.user_id
             WHERE is_active = true      
             ORDER BY user_profiles.id ASC;`
         );

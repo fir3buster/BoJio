@@ -35,6 +35,8 @@ const register = async (req, res) => {
         const email = req.body.email;
         const role = req.body.role || "user";
         // console.log(email, profile_name);
+        const firstName = req.body.firstName;
+        const lastName = req.body.lastName;
 
         // check for duplicate
         const auth = await client.query(
@@ -55,8 +57,8 @@ const register = async (req, res) => {
 
         // Insert user_profile into user_profiles table
         const userResult = await client.query(
-            "INSERT INTO user_profiles(email, hashed_password, profile_name, role) VALUES ($1, $2, $3, $4) RETURNING id;",
-            [email, hash, profile_name, role]
+            "INSERT INTO user_profiles(email, hashed_password, first_name, last_name, role) VALUES ($1, $2, $3, $4, $5) RETURNING id;",
+            [email, hash, firstName, lastName , role]
         );
         console.log(userResult.rows);
 

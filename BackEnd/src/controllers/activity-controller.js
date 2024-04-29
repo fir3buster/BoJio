@@ -4,6 +4,58 @@ const db = database.pool;
 
 // ---------------------------------------------------- Activities ----------------------------------------------------------
 // getting all public activities (include all players that is invited where is_active = true))
+// const getAllPublicActivities = async (req, res) => {
+//     try {
+//         console.log("inside public Controller");
+//         const now = new Date();
+//         const activities = await db.query(
+//             `SELECT
+//                 a.id,
+//                 a.user_id,
+//                 a.title,
+//                 a.schedule,
+//                 a.location,
+//                 a.sport_type,
+//                 a.game_type,
+//                 a.skill_level,
+//                 a.game_private,
+//                 ARRAY_AGG (
+//                     JSON_BUILD_OBJECT (
+//                         'user_id', aud.user_id,
+//                         'is_going', aud.is_going,
+//                         'is_active', aud.is_active       
+//                     )
+//                     ORDER BY
+//                         CASE
+//                             WHEN aud.user_id = a.user_id THEN 0
+//                             ELSE 1
+//                         END
+//                 ) AS players
+//             FROM
+//                 activities a
+//             LEFT JOIN
+//                 activity_user_decisions aud
+//             ON
+//                 a.id = aud.activity_id
+//             WHERE
+//                 a.game_private = FALSE
+//                 AND a.schedule > $1
+//                 AND aud.is_active = TRUE
+//             GROUP BY
+//                 a.id;`,
+//             [now]
+//         );
+//         console.log(activities.rows, typeof activities.rows);
+//         res.status(200).json(activities.rows);
+//     } catch (error) {
+//         console.error(error.message);
+//         res.status(400).json({
+//             status: "error",
+//             msg: "error getting activities",
+//         });
+//     }
+// };
+
 const getAllPublicActivities = async (req, res) => {
     try {
         console.log("inside public Controller");
@@ -22,6 +74,9 @@ const getAllPublicActivities = async (req, res) => {
                 ARRAY_AGG (
                     JSON_BUILD_OBJECT (
                         'user_id', aud.user_id,
+                        'email', up.email,
+                        'profile_name', up.profile_name,
+                        'profile_picture_url', up.profile_picture_url,
                         'is_going', aud.is_going,
                         'is_active', aud.is_active       
                     )
@@ -37,6 +92,10 @@ const getAllPublicActivities = async (req, res) => {
                 activity_user_decisions aud
             ON
                 a.id = aud.activity_id
+            JOIN
+                user_profiles up
+            ON
+                a.id = up.id
             WHERE
                 a.game_private = FALSE
                 AND a.schedule > $1
@@ -94,6 +153,9 @@ const getUpcomingActivitiesByUserId = async (req, res) => {
                 ARRAY_AGG (
                     JSON_BUILD_OBJECT (
                         'user_id', aud.user_id,
+                        'email', up.email,
+                        'profile_name', up.profile_name,
+                        'profile_picture_url', up.profile_picture_url,
                         'is_going', aud.is_going,
                         'is_active', aud.is_active       
                     )
@@ -109,6 +171,10 @@ const getUpcomingActivitiesByUserId = async (req, res) => {
                 activity_user_decisions aud
             ON
                 a.id = aud.activity_id
+            JOIN
+                user_profiles up
+            ON
+                aud.user_id = up.id
             WHERE
                 a.id = ANY($1)
                 AND a.schedule > $2
