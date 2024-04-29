@@ -1,5 +1,11 @@
 CREATE DATABASE bojio;
 
+CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    role_type VARCHAR(10),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE user_profiles (
     id SERIAL PRIMARY KEY, 
     email VARCHAR(50) NOT NULL UNIQUE, 

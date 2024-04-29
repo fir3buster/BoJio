@@ -6,8 +6,9 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const db = require("./src/db/db");
 const auth = require("./src/routers/auth-router");
-const userProfile = require("./src/routers/userProfile-router")
-const activity = require("./src/routers/activity-router")
+const userProfile = require("./src/routers/userProfile-router");
+const activity = require("./src/routers/activity-router");
+const roles = require("./src/routers/roles-router");
 
 // const limiter = rateLimit({
 //     windowMS: 15 * 60 * 1000,
@@ -27,10 +28,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/auth", auth);
-app.use("/profile", userProfile )
-app.use("/activity", activity )
+app.use("/profile", userProfile);
+app.use("/activity", activity);
+app.use("/roles", roles);
 
 const PORT = process.env.PORT || 5555;
 app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`)
-})
+    console.log(`Server started on port ${PORT}`);
+});
