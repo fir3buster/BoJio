@@ -21,10 +21,12 @@ const Login = (props) => {
 
         if (res.ok) {
             console.log(res.data.access, res.data.refresh)
+            // console.log(res.data)
             // set access token
             userCtx.setAccessToken(res.data.access);
             // decode the claims from backend
             const decoded = jwtDecode(res.data.access);
+            console.log(decoded)
             // get the role from the decoded claims
             userCtx.setRole(decoded.role);
             // get userId from decoded claims
