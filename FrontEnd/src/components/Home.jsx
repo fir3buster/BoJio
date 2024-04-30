@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useContext } from 'react';
-import Slider from 'react-slick';
-import ActivitiesActionAreaCard from './ActivitiesActionAreaCard';
-import UsersActionAreaCard from './UsersActionAreaCard';
-import UserContext from '../context/user';
+import React, { useEffect, useState, useContext } from "react";
+import Slider from "react-slick";
+import ActivitiesActionAreaCard from "./ActivitiesActionAreaCard";
+import UsersActionAreaCard from "./UsersActionAreaCard";
+import UserContext from "../context/user";
 import useFetch from "../hooks/useFetch";
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { useNavigate } from "react-router-dom";
 
 const activityCarouselSettings = {
     dots: true,
@@ -14,7 +15,7 @@ const activityCarouselSettings = {
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: false,
-}
+};
 
 const userCarouselSettings = {
     dots: true,
@@ -23,71 +24,203 @@ const userCarouselSettings = {
     slidesToShow: 3,
     slidesToScroll: 3,
     autoplay: false,
-}
+};
 
 const Home = () => {
-    const userCtx = useContext(UserContext)
+    const userCtx = useContext(UserContext);
     const [allActivities, setAllActivities] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchData = useFetch();
+    const navigate = useNavigate();
 
     const getAllPublicActivities = async () => {
         try {
-            console.log("getting all public activities")
-            const res = await fetchData("/activity/public",
+            console.log("getting all public activities");
+            const res = await fetchData(
+                "/activity/public",
                 undefined,
                 undefined,
                 undefined,
                 userCtx.accessToken
             );
-            
-            if (res.ok) {
-                
-                setIsLoading(false);
-                console.log(res.data)
-                setAllActivities(res.data)
-                // setAllActivities()
 
+            if (res.ok) {
+                setIsLoading(false);
+                console.log(res.data);
+                setAllActivities(res.data);
+                // setAllActivities()
             } else {
-                alert(JSON.stringify(res.data))
+                alert(JSON.stringify(res.data));
                 console.log(res.data);
             }
         } catch (error) {
-            console.log(error.message)
+            console.log(error.message);
         }
-    }
+    };
 
     const getAllActiveUsers = async () => {
         try {
-            console.log("getting all active users")
-            const res = await fetchData("/profile/activeusers",
+            console.log("getting all active users");
+            const res = await fetchData(
+                "/profile/activeusers",
                 undefined,
                 undefined,
                 undefined,
                 userCtx.accessToken
             );
-            
+
             if (res.ok) {
                 setIsLoading(false);
-                console.log(res.data)
-                setAllUsers(res.data)
+                console.log(res.data);
+                setAllUsers(res.data);
                 // setAllActivities()
-
             } else {
-                alert(JSON.stringify(res.data))
+                alert(JSON.stringify(res.data));
+                console.log(res.data);
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
+
+    // getting activity based on activity id
+    const getActivityById = async (id) => {
+        try {
+            const res = await fetchData(
+                "/activity/" + id,
+                undefined,
+                undefined,
+                undefined,
+                userCtx.accessToken
+            );
+
+            if (res.ok) {
+                console.log(res.data);
+                userCtx.setDisplayActivity(res.data);
+            } else {
+                alert(JSON.stringify(res.data));
+                console.log(res.data);
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
+
+    const getUserProfileById = async (id) => {
+        try {
+            const res = await fetchData(
+                "/profile/user/" + id,
+                undefined,
+                undefined,
+                undefined,
+                userCtx.accessToken
+            );
+
+            if (res.ok) {
+                console.log(res.data);
+                userCtx.setDisplayPlayer(res.data);
+            } else {
+                alert(JSON.stringify(res.data));
+                console.log(res.data);
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
+    const getFollowingUserById = async (id) => {
+        try {
+            const res = await fetchData(
+                "/profile/following/" + id,
+                undefined,
+                undefined,
+                undefined,
+                userCtx.accessToken
+            );
+
+            if (res.ok) {
+                console.log(res.data);
+                userCtx.setDisplayFollowings(res.data);
+            } else {
+                alert(JSON.stringify(res.data));
                 console.log(res.data);
             }
         } catch (error) {
             console.log(error.message)
         }
     }
-    
+
+    const getFollowersById = async (id) => {
+        try {
+            const res = await fetchData(
+                "/profile/follower/" + id,
+                undefined,
+                undefined,
+                undefined,
+                userCtx.accessToken
+            );
+
+            if (res.ok) {
+                console.log(res.data);
+                userCtx.setDisplayFollowers(res.data);
+            } else {
+                alert(JSON.stringify(res.data));
+                console.log(res.data);
+            }
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
+
+    const getSportCardByUserId = async (id) => {
+        try {
+            const res = await fetchData(
+                "/profile/sportcard/" + id,
+                undefined,
+                undefined,
+                undefined,
+                userCtx.accessToken
+            )
+
+            if (res.ok) {
+                console.log(res.data);
+                userCtx.setDisplaySportCard(res.data);
+            } else {
+                alert(JSON.stringify(res.data));
+                console.log(res.data)
+            } 
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
+
+    const handleActivityCardClick = async (id) => {
+        try {
+            await getActivityById(id);
+            navigate(`/play/${id}`);
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+
+    const handleUserCardClick = async (id) => {
+        try {
+            await getUserProfileById(id);
+            await getFollowingUserById(id);
+            await getFollowersById(id);
+            await getSportCardByUserId(id)
+            navigate(`/player/${id}`)
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
+
     useEffect(() => {
-        getAllPublicActivities()
-        getAllActiveUsers()     
-    }, [])
+        getAllPublicActivities();
+        getAllActiveUsers();
+    }, []);
 
     return (
         // <div>
@@ -99,32 +232,36 @@ const Home = () => {
         <div>
             <h2>Activities</h2>
             <Slider {...activityCarouselSettings}>
-                {allActivities && allActivities.map((item) => (
-                    <ActivitiesActionAreaCard
-                        key={item.id}
-                        id={item.id}
-                        title={item.title}
-                        schedule={item.schedule}
-                        location={item.location}
-                        players={item.players}
-                    />
-                ))}
+                {allActivities &&
+                    allActivities.map((item) => (
+                        <ActivitiesActionAreaCard
+                            key={item.id}
+                            id={item.id}
+                            title={item.title}
+                            schedule={item.schedule}
+                            location={item.location}
+                            players={item.players}
+                            onClick={() => handleActivityCardClick(item.id)}
+                        />
+                    ))}
             </Slider>
             <br />
             <br />
             <hr></hr>
             <h2>People</h2>
             <Slider {...userCarouselSettings}>
-                {allUsers && allUsers.map((item) => (
-                    <UsersActionAreaCard
-                        key={item.id}
-                        id={item.id}
-                        firstName={item.first_name}
-                        lastName={item.last_name}
-                        profilePic={item.profile_picture_url}
-                        location={item.location}
-                    />
-                ))}
+                {allUsers &&
+                    allUsers.map((item) => (
+                        <UsersActionAreaCard
+                            key={item.user_id}  
+                            id={item.user_id}
+                            firstName={item.first_name}
+                            lastName={item.last_name}
+                            profilePic={item.profile_picture_url}
+                            location={item.location}
+                            onClick={() => handleUserCardClick(item.user_id)}
+                        />
+                    ))}
             </Slider>
         </div>
     );

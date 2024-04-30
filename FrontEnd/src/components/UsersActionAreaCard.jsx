@@ -5,10 +5,10 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import { CardActionArea } from "@mui/material";
 
-const UsersActionAreaCard = ({ id, firstName, lastName, location }) => {
+const UsersActionAreaCard = ({ id, firstName, lastName, location, onClick }) => {
     console.log(firstName, lastName);
     return (
-        <Card sx={{ maxWidth: 345, height: 200, margin: "10px" }}>
+        <Card sx={{ maxWidth: 345, height: 200, margin: "10px" }} onClick={onClick}>
             <CardActionArea sx={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}>
                 <CardContent>
                     <Avatar src="/broken-image.jpg" sx={{ width: 70, height: 70}} />

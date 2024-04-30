@@ -14,16 +14,16 @@ const ActivitiesActionAreaCard = ({
     schedule,
     location,
     players,
+    onClick
 }) => {
     return (
-        <Card sx={{ height: "340px", width: "100%" }}>
+        <Card sx={{ height: "340px", width: "100%" }} onClick={onClick}>
             <CardActionArea sx={{ height: "100%" }}>
                 <CardContent>
                     <Typography variant="subtitle1">Tennis MeetUp</Typography>
                     <Typography variant="h5" sx={{ margin: "5px 0" }}>
                         {title}
                     </Typography>
-                    {/* Content at the top */}
                     {players.map((player) => (
                         <Avatar
                             key={player.user_id}

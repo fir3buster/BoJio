@@ -13,6 +13,11 @@ function App() {
     const [role, setRole] = useState("");
     const [showLogin, setShowLogin] = useState(true);
     const [ActiveUserId, setActiveUserId] = useState(0);
+    const [displayActivity, setDisplayActivity] = useState([]);
+    const [displayPlayer, setDisplayPlayer] = useState([])
+    const [displayFollowings, setDisplayFollowings] = useState([]);
+    const [displayFollowers, setDisplayFollowers] = useState([]);
+    const [displaySportCard, setDisplaySportCard] = useState([]);
 
     const [count, setCount] = useState(0);
 
@@ -29,17 +34,27 @@ function App() {
                     showLogin,
                     setShowLogin,
                     ActiveUserId,
-                    setActiveUserId
+                    setActiveUserId,
+                    displayActivity,
+                    setDisplayActivity,
+                    displayPlayer,
+                    setDisplayPlayer,
+                    displayFollowers,
+                    setDisplayFollowers,
+                    displayFollowings,
+                    setDisplayFollowings,
+                    displaySportCard,
+                    setDisplaySportCard
                 }}
             >
-                {/* {accessToken.length > 0 && <MainDisplay></MainDisplay>} */}
-                {<MainDisplay></MainDisplay>}
-                {/* {accessToken.length === 0 && showLogin && (
+                {accessToken.length > 0 && <MainDisplay></MainDisplay>}
+                {/* {<MainDisplay></MainDisplay>} */}
+                {accessToken.length === 0 && showLogin && (
                     <Login setShowLogin={setShowLogin}></Login>
                 )}
                 {accessToken.length === 0 && !showLogin && (
                     <Registration setShowLogin={setShowLogin}></Registration>
-                )} */}
+                )}
             </UserContext.Provider>
         </div>
     );
