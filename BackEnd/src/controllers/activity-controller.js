@@ -23,7 +23,7 @@ const db = database.pool;
 //                     JSON_BUILD_OBJECT (
 //                         'user_id', aud.user_id,
 //                         'is_going', aud.is_going,
-//                         'is_active', aud.is_active       
+//                         'is_active', aud.is_active
 //                     )
 //                     ORDER BY
 //                         CASE
@@ -238,6 +238,9 @@ const getPastActivitiesByUserId = async (req, res) => {
                 ARRAY_AGG (
                     JSON_BUILD_OBJECT (
                         'user_id', aud.user_id,
+                        'email', up.email,
+                        'profile_name', up.profile_name,
+                        'profile_picture_url', up.profile_picture_url,
                         'is_going', aud.is_going,
                         'is_active', aud.is_active       
                     )
@@ -253,6 +256,10 @@ const getPastActivitiesByUserId = async (req, res) => {
                 activity_user_decisions aud
             ON
                 a.id = aud.activity_id
+            JOIN
+                user_profiles up
+            ON
+                aud.user_id = up.id
             WHERE
                 a.id = ANY($1)
                 AND a.schedule < $2
@@ -483,10 +490,15 @@ const deleteActivityById = async (req, res) => {
         const id = req.params.id;
 
         // Check if the record exists before attempting to delete
-        const checkResult = await db.query("SELECT * FROM activities WHERE id = $1;", [id]);
+        const checkResult = await db.query(
+            "SELECT * FROM activities WHERE id = $1;",
+            [id]
+        );
 
         if (checkResult.rowCount === 0) {
-            return res.status(404).json({ status: "error", msg: "activity not found" });
+            return res
+                .status(404)
+                .json({ status: "error", msg: "activity not found" });
         }
 
         await db.query("DELETE FROM activities WHERE id = $1;", [id]);
@@ -514,11 +526,14 @@ const addPlayer = async (req, res) => {
 
         res.status(200).json({
             status: "ok",
-            msg: "add player to activity successfully"
+            msg: "add player to activity successfully",
         });
     } catch (error) {
         console.error(error.message);
-        res.status(400).json({status: "error", msg: "error creating player to activity"})
+        res.status(400).json({
+            status: "error",
+            msg: "error creating player to activity",
+        });
     }
 };
 
@@ -542,7 +557,9 @@ const updatePlayerStatusById = async (req, res) => {
         }
 
         if (updatedFields.length === 0) {
-            return res.status(400).json({status: "error", msg: "no fields to update"})
+            return res
+                .status(400)
+                .json({ status: "error", msg: "no fields to update" });
         }
 
         placeholderCount++;
@@ -553,12 +570,15 @@ const updatePlayerStatusById = async (req, res) => {
         await db.query(
             `UPDATE activity_user_decisions SET ${updatedFieldsQuery} WHERE id = $${placeholderCount};`,
             updatedParams
-        )
+        );
 
-        res.json({status: "ok", msg: "player status updated successfully"})
+        res.json({ status: "ok", msg: "player status updated successfully" });
     } catch (error) {
         console.error(error.message);
-        res.status(400).json({status: "error", msg: "error updating player's status"})
+        res.status(400).json({
+            status: "error",
+            msg: "error updating player's status",
+        });
     }
 };
 
@@ -568,20 +588,27 @@ const deletePlayerById = async (req, res) => {
         const id = req.params.id;
 
         // Check if the record exists before attempting to delete
-        const checkResult = await db.query("SELECT * FROM activity_user_decisions WHERE id = $1;", [id]);
+        const checkResult = await db.query(
+            "SELECT * FROM activity_user_decisions WHERE id = $1;",
+            [id]
+        );
 
         if (checkResult.rowCount === 0) {
-            return res.status(404).json({ status: "error", msg: "Player not found" });
+            return res
+                .status(404)
+                .json({ status: "error", msg: "Player not found" });
         }
 
-        await db.query("DELETE FROM activity_user_decisions WHERE id = $1;", [id]);
+        await db.query("DELETE FROM activity_user_decisions WHERE id = $1;", [
+            id,
+        ]);
 
         res.status(200).json({ status: "ok", msg: "player deleted" });
     } catch (error) {
         console.error(error.message);
         res.status(400).json({ status: "ok", msg: "error deleting player" });
     }
-}
+};
 
 module.exports = {
     getAllPublicActivities,

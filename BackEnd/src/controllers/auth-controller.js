@@ -114,7 +114,7 @@ const login = async (req, res) => {
         }
 
         const auth_content = auth.rows[0];
-        // console.log(auth_content, typeof auth_content);
+        console.log(auth_content, typeof auth_content);
 
         // result returning boolean (true or false)
         const result = await bcrypt.compare(
@@ -129,6 +129,7 @@ const login = async (req, res) => {
         }
 
         const claims = {
+            id: auth_content.user_id,
             email: auth_content.email,
             role: auth_content.role,
         };
