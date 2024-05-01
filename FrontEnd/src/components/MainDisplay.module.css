@@ -9,7 +9,7 @@
 
 .container {
     display: grid;
-    grid-template-columns: 30% 40% 30%; /* Adjust column widths */
+    grid-template-columns: 30% 35% 35%; /* Adjust column widths */
     height: 100vh; /* Occupy the full height of the viewport */
     padding: 0;
     margin: 0;
@@ -21,7 +21,7 @@
 }
 
 .center-col {
-    background-color: gray; 
+    background-color: #b4b0b0; 
     padding: 2rem; 
     overflow-y: auto;
 }

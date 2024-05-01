@@ -18,7 +18,7 @@ function App() {
     const [displayFollowings, setDisplayFollowings] = useState([]);
     const [displayFollowers, setDisplayFollowers] = useState([]);
     const [displaySportCard, setDisplaySportCard] = useState([]);
-
+    const [isJoined, setIsJoined] = useState(false)
     const [count, setCount] = useState(0);
 
     return (
@@ -44,17 +44,19 @@ function App() {
                     displayFollowings,
                     setDisplayFollowings,
                     displaySportCard,
-                    setDisplaySportCard
+                    setDisplaySportCard,
+                    isJoined,
+                    setIsJoined
                 }}
             >
-                {accessToken.length > 0 && <MainDisplay></MainDisplay>}
-                {/* {<MainDisplay></MainDisplay>} */}
-                {accessToken.length === 0 && showLogin && (
+                {/* {accessToken.length > 0 && <MainDisplay></MainDisplay>} */}
+                {<MainDisplay></MainDisplay>}
+                {/* {accessToken.length === 0 && showLogin && (
                     <Login setShowLogin={setShowLogin}></Login>
                 )}
                 {accessToken.length === 0 && !showLogin && (
                     <Registration setShowLogin={setShowLogin}></Registration>
-                )}
+                )} */}
             </UserContext.Provider>
         </div>
     );

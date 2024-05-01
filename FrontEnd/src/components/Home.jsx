@@ -35,11 +35,11 @@ const Home = () => {
     const fetchData = useFetch();
     const navigate = useNavigate();
 
-    const getAllPublicActivities = async () => {
+    const getAllPublicActivities = async (id) => {
         try {
             console.log("getting all public activities");
             const res = await fetchData(
-                "/activity/public",
+                "/activity/public/" + id,
                 undefined,
                 undefined,
                 undefined,
@@ -218,8 +218,10 @@ const Home = () => {
     }
 
     useEffect(() => {
-        getAllPublicActivities();
+        // getAllPublicActivities(activeUserId);
+        getAllPublicActivities(6);
         getAllActiveUsers();
+        userCtx.setIsJoined(false)
     }, []);
 
     return (
@@ -238,8 +240,14 @@ const Home = () => {
                             key={item.id}
                             id={item.id}
                             title={item.title}
-                            schedule={item.schedule}
+                            date={item.date}
+                            startTime={item.start_time}
+                            endTime={item.end_time}
                             location={item.location}
+                            isBooked={item.court_booked}
+                            skillRate={item.skill_rate}
+                            minPeople={item.min_people}
+                            maxPeople={item.max_people}
                             players={item.players}
                             onClick={() => handleActivityCardClick(item.id)}
                         />
@@ -257,6 +265,7 @@ const Home = () => {
                             id={item.user_id}
                             firstName={item.first_name}
                             lastName={item.last_name}
+                            profileName={item.profile_name}
                             profilePic={item.profile_picture_url}
                             location={item.location}
                             onClick={() => handleUserCardClick(item.user_id)}
