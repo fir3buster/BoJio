@@ -28,6 +28,18 @@ const getAllUsers = async (req, res) => {
 
 // registering user
 const register = async (req, res) => {
+    const colors = [
+        deepOrange,
+        deepPurple,
+        teal,
+        indigo,
+        red,
+        blue,
+        green,
+        orange,
+        pink,
+        yellow,
+    ];
     const client = await db.connect(); // explicitly acquire connection for multiple queries
     try {
         await client.query("BEGIN");
@@ -37,6 +49,8 @@ const register = async (req, res) => {
         // console.log(email, profile_name);
         const firstName = req.body.firstName;
         const lastName = req.body.lastName;
+        const profileName = (firstName[0] + lastName[0]).upper();
+        const profileColor = getRandomItem(colors)
 
         // check for duplicate
         const auth = await client.query(
@@ -57,8 +71,8 @@ const register = async (req, res) => {
 
         // Insert user_profile into user_profiles table
         const userResult = await client.query(
-            "INSERT INTO user_profiles(email, hashed_password, first_name, last_name, role) VALUES ($1, $2, $3, $4, $5) RETURNING id;",
-            [email, hash, firstName, lastName , role]
+            "INSERT INTO user_profiles(email, hashed_password, first_name, last_name, profile_name, profile_picture_url, role) VALUES ($1, $2, $3, $4, $5) RETURNING id;",
+            [email, hash, firstName, lastName, profileName, profileColor, role]
         );
         console.log(userResult.rows);
 
@@ -107,10 +121,9 @@ const login = async (req, res) => {
         console.log(auth.rows);
         if (auth.rows.length === 0) {
             console.log("in if statement");
-            return (
-                res.status(400).
-                json({ status: "error", msg: "not authorized" })
-            );
+            return res
+                .status(400)
+                .json({ status: "error", msg: "not authorized" });
         }
 
         const auth_content = auth.rows[0];
@@ -175,5 +188,11 @@ const refresh = async (req, res) => {
         res.status(400).json({ status: "error", msg: "refreshing token" });
     }
 };
+
+// helper functions
+function getRandomItem(array) {
+    const randomIndex = Math.floor(Math.random() * array.length);
+    return array[randomIndex];
+}
 
 module.exports = { getAllUsers, register, login, refresh };

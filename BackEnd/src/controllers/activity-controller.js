@@ -13,36 +13,51 @@ const db = database.pool;
 //                 a.id,
 //                 a.user_id,
 //                 a.title,
-//                 a.schedule,
+//                 a.date,
+//                 a.start_time,
+//                 a.end_time,
 //                 a.location,
 //                 a.sport_type,
 //                 a.game_type,
-//                 a.skill_level,
+//                 a.min_people,
+//                 a.max_people,
+//                 a.skill_rate,
 //                 a.game_private,
-//                 ARRAY_AGG (
-//                     JSON_BUILD_OBJECT (
-//                         'user_id', aud.user_id,
-//                         'is_going', aud.is_going,
-//                         'is_active', aud.is_active
-//                     )
-//                     ORDER BY
-//                         CASE
-//                             WHEN aud.user_id = a.user_id THEN 0
-//                             ELSE 1
-//                         END
+//                 a.court_booked,
+//                 (
+//                     SELECT
+//                         ARRAY_AGG(
+//                             JSON_BUILD_OBJECT(
+//                                 'user_id', aud.user_id,
+//                                 'email', up.email,
+//                                 'profile_name', up.profile_name,
+//                                 'profile_picture_url', up.profile_picture_url,
+//                                 'is_going', aud.is_going,
+//                                 'is_active', aud.is_active
+//                             )
+//                         ORDER BY
+//                             CASE
+//                                 WHEN aud.user_id = a.user_id THEN 0
+//                                 ELSE 1
+//                             END
+//                         )
+//                     FROM
+//                         activity_user_decisions aud
+//                     JOIN
+//                         user_profiles up
+//                     ON
+//                         aud.user_id = up.id
+//                     WHERE
+//                         aud.activity_id = a.id
+//                         AND aud.is_active = TRUE
 //                 ) AS players
 //             FROM
 //                 activities a
-//             LEFT JOIN
-//                 activity_user_decisions aud
-//             ON
-//                 a.id = aud.activity_id
 //             WHERE
 //                 a.game_private = FALSE
-//                 AND a.schedule > $1
-//                 AND aud.is_active = TRUE
-//             GROUP BY
-//                 a.id;`,
+//                 AND a.date > $1
+//             ORDER BY
+//                 a.date;`,
 //             [now]
 //         );
 //         console.log(activities.rows, typeof activities.rows);
@@ -56,53 +71,64 @@ const db = database.pool;
 //     }
 // };
 
+// have to exclude the activites that the active user has joined
 const getAllPublicActivities = async (req, res) => {
     try {
         console.log("inside public Controller");
+        const activeUserId = req.params.user_id
         const now = new Date();
         const activities = await db.query(
             `SELECT
                 a.id,
                 a.user_id,
                 a.title,
-                a.schedule,
+                a.date,
+                a.start_time,
+                a.end_time,
                 a.location,
                 a.sport_type,
                 a.game_type,
-                a.skill_level,
+                a.min_people,
+                a.max_people,
+                a.skill_rate,
                 a.game_private,
-                ARRAY_AGG (
-                    JSON_BUILD_OBJECT (
-                        'user_id', aud.user_id,
-                        'email', up.email,
-                        'profile_name', up.profile_name,
-                        'profile_picture_url', up.profile_picture_url,
-                        'is_going', aud.is_going,
-                        'is_active', aud.is_active       
-                    )
-                    ORDER BY
-                        CASE
-                            WHEN aud.user_id = a.user_id THEN 0
-                            ELSE 1
-                        END
+                a.court_booked,
+                (
+                    SELECT
+                        ARRAY_AGG(
+                            JSON_BUILD_OBJECT(
+                                'user_id', aud.user_id,
+                                'email', up.email,
+                                'profile_name', up.profile_name,
+                                'profile_picture_url', up.profile_picture_url,
+                                'is_going', aud.is_going,
+                                'is_active', aud.is_active
+                                )
+                            ORDER BY
+                                CASE
+                                    WHEN aud.user_id = a.user_id THEN 0
+                                    ELSE 1
+                                END
+                            )
+                    FROM
+                        activity_user_decisions aud
+                    JOIN
+                        user_profiles up
+                    ON
+                        aud.user_id = up.id
+                    WHERE
+                        aud.activity_id = a.id
+                        AND aud.is_active = TRUE
                 ) AS players
             FROM
                 activities a
-            LEFT JOIN
-                activity_user_decisions aud
-            ON
-                a.id = aud.activity_id
-            JOIN
-                user_profiles up
-            ON
-                a.id = up.id
             WHERE
                 a.game_private = FALSE
-                AND a.schedule > $1
-                AND aud.is_active = TRUE
-            GROUP BY
-                a.id;`,
-            [now]
+                AND a.date > $1
+                AND a.user_id <> $2
+            ORDER BY
+                a.date;`,
+            [now, activeUserId]
         );
         console.log(activities.rows, typeof activities.rows);
         res.status(200).json(activities.rows);
@@ -115,13 +141,16 @@ const getAllPublicActivities = async (req, res) => {
     }
 };
 
+
 // getting upcoming activity by id (include all players that is invited where is_active = true))
 const getUpcomingActivitiesByUserId = async (req, res) => {
     const client = await db.connect();
     try {
         await client.query("BEGIN");
         const now = new Date();
-        const userId = req.params.user_id;
+        // const userId = req.params.user_id;
+        // hardCODED at the moment
+        const userId = 6;
 
         const activitiesId = await client.query(
             `SELECT activity_id FROM activity_user_decisions WHERE user_id = $1 AND is_active = TRUE;`,
@@ -144,43 +173,51 @@ const getUpcomingActivitiesByUserId = async (req, res) => {
                 a.id,
                 a.user_id,
                 a.title,
-                a.schedule,
+                a.date,
+                a.start_time,
+                a.end_time,
                 a.location,
                 a.sport_type,
                 a.game_type,
-                a.skill_level,
+                a.min_people,
+                a.max_people,
+                a.skill_rate,
                 a.game_private,
-                ARRAY_AGG (
-                    JSON_BUILD_OBJECT (
-                        'user_id', aud.user_id,
-                        'email', up.email,
-                        'profile_name', up.profile_name,
-                        'profile_picture_url', up.profile_picture_url,
-                        'is_going', aud.is_going,
-                        'is_active', aud.is_active       
-                    )
-                    ORDER BY
-                        CASE
-                            WHEN aud.user_id = a.user_id THEN 0
-                            ELSE 1
-                        END
+                a.court_booked,
+                (
+                    SELECT
+                        ARRAY_AGG(
+                            JSON_BUILD_OBJECT(
+                                'user_id', aud.user_id,
+                                'email', up.email,
+                                'profile_name', up.profile_name,
+                                'profile_picture_url', up.profile_picture_url,
+                                'is_going', aud.is_going,
+                                'is_active', aud.is_active
+                            )
+                        ORDER BY
+                            CASE
+                                WHEN aud.user_id = a.user_id THEN 0
+                                ELSE 1
+                            END
+                        )
+                    FROM
+                        activity_user_decisions aud
+                    JOIN
+                        user_profiles up
+                    ON
+                        aud.user_id = up.id
+                    WHERE
+                        aud.activity_id = a.id
+                        AND aud.is_active = TRUE    
                 ) AS players
             FROM
                 activities a
-            LEFT JOIN
-                activity_user_decisions aud
-            ON
-                a.id = aud.activity_id
-            JOIN
-                user_profiles up
-            ON
-                aud.user_id = up.id
             WHERE
                 a.id = ANY($1)
-                AND a.schedule > $2
-                AND aud.is_active = TRUE
-            GROUP BY
-                a.id;`,
+                AND a.date > $2
+            ORDER BY
+                a.date;`,
             [ids, now]
         );
 
@@ -206,7 +243,9 @@ const getPastActivitiesByUserId = async (req, res) => {
     try {
         await client.query("BEGIN");
         const now = new Date();
-        const userId = req.params.user_id;
+        // const userId = req.params.user_id;
+        // HARDCODED
+        const userId = 6;
 
         const activitiesId = await client.query(
             `SELECT activity_id FROM activity_user_decisions WHERE user_id = $1 AND is_active = TRUE;`,
@@ -229,43 +268,51 @@ const getPastActivitiesByUserId = async (req, res) => {
                 a.id,
                 a.user_id,
                 a.title,
-                a.schedule,
+                a.date,
+                a.start_time,
+                a.end_time,
                 a.location,
                 a.sport_type,
                 a.game_type,
-                a.skill_level,
+                a.min_people,
+                a.max_people,
+                a.skill_rate,
                 a.game_private,
-                ARRAY_AGG (
-                    JSON_BUILD_OBJECT (
-                        'user_id', aud.user_id,
-                        'email', up.email,
-                        'profile_name', up.profile_name,
-                        'profile_picture_url', up.profile_picture_url,
-                        'is_going', aud.is_going,
-                        'is_active', aud.is_active       
-                    )
-                    ORDER BY
-                        CASE
-                            WHEN aud.user_id = a.user_id THEN 0
-                            ELSE 1
-                        END
+                a.court_booked,
+                (
+                    SELECT
+                        ARRAY_AGG(
+                            JSON_BUILD_OBJECT(
+                                'user_id', aud.user_id,
+                                'email', up.email,
+                                'profile_name', up.profile_name,
+                                'profile_picture_url', up.profile_picture_url,
+                                'is_going', aud.is_going,
+                                'is_active', aud.is_active
+                            )
+                        ORDER BY
+                            CASE
+                                WHEN aud.user_id = a.user_id THEN 0
+                                ELSE 1
+                            END
+                        )
+                    FROM
+                        activity_user_decisions aud
+                    JOIN
+                        user_profiles up
+                    ON
+                        aud.user_id = up.id
+                    WHERE
+                        aud.activity_id = a.id
+                        AND aud.is_active = TRUE    
                 ) AS players
             FROM
                 activities a
-            LEFT JOIN
-                activity_user_decisions aud
-            ON
-                a.id = aud.activity_id
-            JOIN
-                user_profiles up
-            ON
-                aud.user_id = up.id
             WHERE
                 a.id = ANY($1)
-                AND a.schedule < $2
-                AND aud.is_active = TRUE
-            GROUP BY
-                a.id;`,
+                AND a.date < $2
+            ORDER BY
+                a.date;`,
             [ids, now]
         );
 
@@ -303,7 +350,13 @@ const getActivityById = async (req, res) => {
         }
 
         const players = await client.query(
-            `SELECT * FROM activity_user_decisions WHERE activity_id = $1 AND is_active = TRUE
+            `SELECT aud.user_id, aud.is_going, aud.is_active, up.profile_name, up.profile_picture_url, up.first_name, up.last_name FROM activity_user_decisions aud
+            JOIN
+                user_profiles up
+            ON
+                aud.user_id = up.id
+            WHERE
+                activity_id = $1 AND is_active = TRUE
             ORDER BY
                 CASE
                     WHEN user_id = $2 then 0
@@ -340,28 +393,34 @@ const addActivity = async (req, res) => {
         const userId = req.body.user_id;
         const sportType = req.body.sport_type || "tennis";
         const gameType = req.body.game_type || "singles";
-        const title = req.body.title || `${gameType}`;
-        const schedule = req.body.schedule;
+        const title = req.body.title;
+        const date = req.body.date;
+        const startTime = req.body.start_time;
+        const endTime = req.body.end_time;
         const location = req.body.location;
         const minPeople = req.body.min_people || 2;
         const maxPeople = req.body.max_people || 2;
-        const skillLevel = req.body.skill_level || 1.0;
+        const skillRate = req.body.skill_rate || "1.0";
         const gamePrivate = req.body.game_private || false;
+        const courtBooked = req.body.court_booked || false;
 
         const activityResult = await client.query(
-            `INSERT INTO activities(user_id, sport_type, game_type, title, schedule, location, min_people, max_people, skill_level, game_private) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id;`,
+            `INSERT INTO activities(user_id, sport_type, game_type, title, date, start_time, end_time, location, min_people, max_people, skill_rate, game_private, court_booked) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id;`,
             [
                 userId,
                 sportType,
                 gameType,
                 title,
-                schedule,
+                date,
+                startTime,
+                endTime,
                 location,
                 minPeople,
                 maxPeople,
-                skillLevel,
+                skillRate,
                 gamePrivate,
+                courtBooked,
             ]
         );
 
@@ -410,10 +469,22 @@ const updateActivityById = async (req, res) => {
             updatedParams.push(req.body.title);
         }
 
-        if ("schedule" in req.body) {
+        if ("date" in req.body) {
             placeholderCount++;
-            updatedFields.push(`schedule=$${placeholderCount}`);
-            updatedParams.push(req.body.schedule);
+            updatedFields.push(`date=$${placeholderCount}`);
+            updatedParams.push(req.body.date);
+        }
+
+        if ("start_time" in req.body) {
+            placeholderCount++;
+            updatedFields.push(`start_time=$${placeholderCount}`);
+            updatedParams.push(req.body.start_time);
+        }
+
+        if ("end_time" in req.body) {
+            placeholderCount++;
+            updatedFields.push(`date=$${placeholderCount}`);
+            updatedParams.push(req.body.end_time);
         }
 
         if ("location" in req.body) {
@@ -440,16 +511,22 @@ const updateActivityById = async (req, res) => {
             updatedParams.push(req.body.max_people);
         }
 
-        if ("skill_level" in req.body) {
+        if ("skill_rate" in req.body) {
             placeholderCount++;
-            updatedFields.push(`skill_level=$${placeholderCount}`);
-            updatedParams.push(req.body.skill_level);
+            updatedFields.push(`skill_rate=$${placeholderCount}`);
+            updatedParams.push(req.body.skill_rate);
         }
 
         if ("game_private" in req.body) {
             placeholderCount++;
             updatedFields.push(`game_private=$${placeholderCount}`);
             updatedParams.push(req.body.game_private);
+        }
+
+        if ("court_booked" in req.body) {
+            placeholderCount++;
+            updatedFields.push(`court_booked=$${placeholderCount}`);
+            updatedParams.push(req.body.court_booked);
         }
 
         if (updatedFields.length === 0) {
@@ -622,3 +699,7 @@ module.exports = {
     updatePlayerStatusById,
     deletePlayerById,
 };
+
+
+
+//         // hardCODED at the moment => line 145,240
