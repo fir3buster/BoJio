@@ -36,6 +36,31 @@ const ActivitiesActionAreaCard = ({
         return player.is_going ? count + 1 : count;
     }, 0);
 
+    const joinGame = async () => {
+        try {
+            const res = await fetchData(
+                "/activity/player",
+                "POST",
+                {
+                    activity_id: id,
+                    user_id: userCtx.activeUserId,
+                    is_going: true,
+                    is_active: true,
+                },
+                userCtx.accessToken
+            );
+
+            if (res.ok) {
+                alert("Join Game Successfully");
+                getDisplayActivity();
+                onClose();
+            }
+        } catch (error) {
+            alert(JSON.stringify(error.message));
+            console.log(error.message);
+        }
+    };
+
     return (
         <Card
             sx={!isJoined ? {
@@ -51,7 +76,7 @@ const ActivitiesActionAreaCard = ({
                 margin: "10px 0 10px 0",
             }}
         >
-            <CardActionArea sx={{ height: "85%" }} onClick={onClick}>
+            <CardActionArea sx={{ height: "100%" }} onClick={onClick}>
                 <CardContent sx={{ marginTop: "-25px" }}>
                     <Stack direction="row" spacing={1} alignItems="center">
                         <SportsTennisOutlinedIcon />
@@ -125,30 +150,6 @@ const ActivitiesActionAreaCard = ({
                     </Stack>
                 </CardContent>
             </CardActionArea>
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-            >
-                {/* {!isJoined && !isPast ? ( */}
-                {!isJoined ? (
-                    <Button
-                        size="large"
-                        color="primary"
-                        variant="outlined"
-                        onClick={onClick} // Set onClick handler
-                        style={{
-                            fontSize: "0.75rem",
-                            fontWeight: "bold",
-                            width: "80%",
-                        }}
-                    >
-                        JOIN
-                    </Button>
-                ) : null}
-            </Box>
         </Card>
     );
 };

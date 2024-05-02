@@ -195,7 +195,7 @@ const Home = () => {
             console.log(error.message)
         }
     }
-
+    
     const handleActivityCardClick = async (id) => {
         try {
             await getActivityById(id);

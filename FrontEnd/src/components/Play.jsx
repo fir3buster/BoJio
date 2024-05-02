@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState, useContext, useRef } from "react";
 import UserContext from "../context/user";
 import useFetch from "../hooks/useFetch";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import {
     ToggleButtonGroup,
     ToggleButton,
@@ -41,6 +41,7 @@ const Play = () => {
     const [isButtonDropDown, setIsButtonDropDown] = useState(false);
     const [showUpdateActivity, setShowUpdateActivity] = useState(false);
     const [showInvitePlayers, setShowInvitePlayers] = useState(false);
+    const [showLeftGame, setShowLeftGame] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
     const [showJoinGame, setShowJoinGame] = useState(false);
@@ -104,10 +105,10 @@ const Play = () => {
                 "/activity/" + userCtx.displayActivity[0].id,
                 "PUT",
                 {
-                    user_id: userCtx.ActiveUserId,
-                    date: dateRef.current.value,
-                    start_time: startTimeRef.current.value,
-                    end_time: endTimeRef.current.value,
+                    // user_id: userCtx.ActiveUserId,
+                    // date: dateRef.current.value,
+                    // start_time: startTimeRef.current.value,
+                    // end_time: endTimeRef.current.value,
                     location: locationRef.current.value,
                     title: titleRef.current.value,
                     min_people: minPeopleRef.current.value,
@@ -121,6 +122,7 @@ const Play = () => {
 
             if (res.ok) {
                 // add more here
+                alert("Activity Updated Successfully");
                 fetchActivity();
             }
         } catch (error) {
@@ -139,7 +141,7 @@ const Play = () => {
             );
 
             if (res.ok) {
-                alert("Activity Deleted Successfully!")
+                alert("Activity Deleted Successfully!");
                 navigate(`/schedule`);
             } else {
                 alert(JSON.stringify(res.data));
@@ -149,6 +151,55 @@ const Play = () => {
             console.log(error.message);
         }
     };
+
+    const joinGame = async () => {
+        try {
+            const res = await fetchData(
+                "/activity/player",
+                "POST",
+                {
+                    activity_id: id,
+                    user_id: userCtx.activeUserId,
+                    is_going: true,
+                    is_active: true,
+                },
+                userCtx.accessToken
+            );
+
+            if (res.ok) {
+                alert("Joined Game Successfully");
+                userCtx.setIsJoined(true);
+                fetchActivity();
+            }
+        } catch (error) {
+            alert(JSON.stringify(error.message));
+            console.log(error.message);
+        }
+    };
+
+    const leaveGame = async () => {
+        try {
+            const res = await fetchData(
+                "/activity/player/" + id,
+                "DELETE",
+                {
+                    user_id: userCtx.activeUserId,
+                },
+                userCtx.accessToken
+            );
+
+            if (res.ok) {
+                alert("you have left the game");
+                userCtx.setIsJoined(false);
+                setShowLeftGame(false);
+                fetchActivity();
+            }
+        } catch (error) {
+            alert(JSON.stringify(error.message));
+            console.log(error.message);
+        }
+    };
+
     // const handleAddActivityClick = () => {
     //     setShowCreate(true);
     // };
@@ -174,13 +225,16 @@ const Play = () => {
         setIsButtonDropDown(!isButtonDropDown);
     };
 
+    const toggleJoinedClick = () => {
+        setShowLeftGame(!showLeftGame);
+    };
+
     const handleUpdateActivityClick = () => {
         setShowUpdateActivity(true);
-        setIsCourtBooked(userCtx.displayActivity[0].court_booked)
-        // setIsCourtBooked(userCtx.displayActivity[0].court_booked)
-        setIsGamePrivate(userCtx.displayActivity[0].game_private)
-        setSkillRate(userCtx.displayActivity[0].skill_rate)
-        setGameType(userCtx.displayActivity[0].game_type)
+        setIsCourtBooked(userCtx.displayActivity[0].court_booked);
+        setIsGamePrivate(userCtx.displayActivity[0].game_private);
+        setSkillRate(userCtx.displayActivity[0].skill_rate);
+        setGameType(userCtx.displayActivity[0].game_type);
     };
 
     const handleCourtBookedChange = (event) => {
@@ -200,12 +254,13 @@ const Play = () => {
     };
 
     const handleInvitePlayer = () => {
-        setShowInvitePlayers(true)
-    }
+        setShowInvitePlayers(true);
+    };
 
     const handleModalClose = () => {
         setShowUpdateActivity(false);
-        setShowDeleteActivity(false);
+        // setShowDeleteActivity(false);
+        setShowInvitePlayers(false);
     };
 
     const valueText = (value) => `${value}`;
@@ -241,14 +296,12 @@ const Play = () => {
         },
     ];
 
-    
     useEffect(() => {
         console.log(userCtx.displayActivity);
         if (!userCtx.displayActivity) {
             fetchActivity();
         }
-        
-    }, [id]); // Rerun if the ID changes
+    }, [id, userCtx.isJoined]); // Rerun if the ID changes
 
     // if (isLoading) {
     //     return <div>Loading...</div>; // Display loading state
@@ -269,7 +322,8 @@ const Play = () => {
             {/* <h1>Activity Details for ID: {id}</h1>
             {JSON.stringify(userCtx.displayActivity)}
             <hr /> */}
-            {userCtx.displayActivity && !showUpdateActivity &&
+            {userCtx.displayActivity &&
+                !showUpdateActivity &&
                 userCtx.displayActivity.map((item) => (
                     <div>
                         {/* <div>
@@ -324,7 +378,9 @@ const Play = () => {
                                     ) : null}
 
                                     {isButtonDropDown && (
-                                        <div className={styles.dropdownContainer}>
+                                        <div
+                                            className={styles.dropdownContainer}
+                                        >
                                             <button
                                                 onClick={
                                                     handleUpdateActivityClick
@@ -560,7 +616,7 @@ const Play = () => {
                         fontWeight: "bold",
                         width: "100%",
                     }}
-                    // onClick={()},
+                    onClick={toggleJoinedClick}
                 >
                     JOINED
                 </Button>
@@ -576,9 +632,27 @@ const Play = () => {
                         fontWeight: "bold",
                         width: "100%",
                     }}
-                    // onClick={()},
+                    onClick={joinGame}
                 >
                     JOIN
+                </Button>
+            )}
+
+            {showLeftGame && (
+                <Button
+                    size="large"
+                    color="secondary"
+                    variant="outlined"
+                    style={{
+                        position: "absolute",
+                        bottom: "40px",
+                        fontSize: "0.75rem",
+                        fontWeight: "bold",
+                        width: "100%",
+                    }}
+                    onClick={leaveGame}
+                >
+                    Leave Game
                 </Button>
             )}
 
@@ -634,14 +708,17 @@ const Play = () => {
                         alignItems="center"
                         margin="10px 0 0 0"
                     >
-                        
                         <CalendarMonthOutlinedIcon />
                         <Typography>
                             <input
                                 required
                                 type="date"
                                 ref={dateRef}
-                                defaultValue={(userCtx.displayActivity[0].date).split("T")[0]}
+                                defaultValue={
+                                    userCtx.displayActivity[0].date.split(
+                                        "T"
+                                    )[0]
+                                }
                             />
                         </Typography>
                     </Stack>
@@ -840,7 +917,7 @@ const Play = () => {
                             />
                         </Typography>
                     </Stack>
-                    <div style={{ height:"150px" }}></div>
+                    <div style={{ height: "150px" }}></div>
                     <Button
                         size="large"
                         color="primary"
@@ -852,7 +929,7 @@ const Play = () => {
                         }}
                         onClick={updateActivity}
                     >
-                        SUBMIT
+                        UPDATE
                     </Button>
                 </div>
             )}
@@ -862,9 +939,7 @@ const Play = () => {
                     onClose={handleModalClose}
                     getDisplayActivity={fetchActivity}
                     id={id}
-                >
-
-                </InvitePlayers>
+                ></InvitePlayers>
             )}
 
             {/* {accessToken.length === 0 && showLogin && (

@@ -12,7 +12,7 @@ function App() {
     const [accessToken, setAccessToken] = useState("");
     const [role, setRole] = useState("");
     const [showLogin, setShowLogin] = useState(true);
-    const [ActiveUserId, setActiveUserId] = useState(0);
+    const [activeUserId, setActiveUserId] = useState(0);
     const [displayActivity, setDisplayActivity] = useState([]);
     const [displayPlayer, setDisplayPlayer] = useState([])
     const [displayFollowings, setDisplayFollowings] = useState([]);
@@ -33,7 +33,7 @@ function App() {
                     setRole,
                     showLogin,
                     setShowLogin,
-                    ActiveUserId,
+                    activeUserId,
                     setActiveUserId,
                     displayActivity,
                     setDisplayActivity,

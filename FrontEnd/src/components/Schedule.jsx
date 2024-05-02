@@ -62,7 +62,7 @@ const Schedule = () => {
         try {
             console.log("getting upcoming activities");
             const res = await fetchData(
-                "/activity/upcoming/" + userCtx.ActiveUserId,
+                "/activity/upcoming/" + userCtx.activeUserId,
                 undefined,
                 undefined,
                 userCtx.accessToken
@@ -83,7 +83,7 @@ const Schedule = () => {
         try {
             console.log("getting past activities");
             const res = await fetchData(
-                "/activity/past/" + userCtx.ActiveUserId,
+                "/activity/past/" + userCtx.activeUserId,
                 undefined,
                 undefined,
                 userCtx.accessToken
@@ -140,7 +140,7 @@ const Schedule = () => {
                 "/activity",
                 "POST",
                 {
-                    user_id: userCtx.ActiveUserId,
+                    user_id: userCtx.activeUserId,
                     date: dateRef.current.value,
                     start_time: startTimeRef.current.value,
                     end_time: endTimeRef.current.value,

@@ -662,12 +662,13 @@ const updatePlayerStatusById = async (req, res) => {
 // delete player when he left the game
 const deletePlayerById = async (req, res) => {
     try {
-        const id = req.params.id;
-
+        const activityId = req.params.id;
+        const userId = req.body.user_id;
+        console.log(userId)
         // Check if the record exists before attempting to delete
         const checkResult = await db.query(
-            "SELECT * FROM activity_user_decisions WHERE id = $1;",
-            [id]
+            "SELECT * FROM activity_user_decisions WHERE activity_id = $1 AND user_id = $2 ;",
+            [activityId, userId]
         );
 
         if (checkResult.rowCount === 0) {
@@ -676,14 +677,14 @@ const deletePlayerById = async (req, res) => {
                 .json({ status: "error", msg: "Player not found" });
         }
 
-        await db.query("DELETE FROM activity_user_decisions WHERE id = $1;", [
-            id,
-        ]);
+        await db.query("DELETE FROM activity_user_decisions WHERE activity_id = $1 and user_id = $2;", 
+            [activityId, userId]
+        );
 
         res.status(200).json({ status: "ok", msg: "player deleted" });
     } catch (error) {
         console.error(error.message);
-        res.status(400).json({ status: "ok", msg: "error deleting player" });
+        res.status(400).json({ status: "error", msg: "error deleting player" });
     }
 };
 
