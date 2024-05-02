@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import NavBar from "./NavBar";
-import Home from "./Home";  
+import Home from "./Home";
 import Feed from "./Feed";
 import Schedule from "./Schedule";
 import Profile from "./Profile";
@@ -22,7 +22,7 @@ const MainDisplay = () => {
                     <Route path="feed" element={<Feed />} />
                     <Route path="schedule" element={<Schedule />} />
                     <Route path="profile" element={<Profile />} />
-                    <Route path="/play/:id" element={<Play />} /> 
+                    <Route path="/play/:id" element={<Play />} />
                     <Route path="/player/:id" element={<Player />} />
                     {/* dynamic route with parameter */}
                 </Routes>

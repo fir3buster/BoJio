@@ -49,14 +49,14 @@ function App() {
                     setIsJoined
                 }}
             >
-                {/* {accessToken.length > 0 && <MainDisplay></MainDisplay>} */}
-                {<MainDisplay></MainDisplay>}
-                {/* {accessToken.length === 0 && showLogin && (
+                {accessToken.length > 0 && <MainDisplay></MainDisplay>}
+                {/* {<MainDisplay></MainDisplay>} */}
+                {accessToken.length === 0 && showLogin && (
                     <Login setShowLogin={setShowLogin}></Login>
                 )}
                 {accessToken.length === 0 && !showLogin && (
                     <Registration setShowLogin={setShowLogin}></Registration>
-                )} */}
+                )}
             </UserContext.Provider>
         </div>
     );

@@ -5,7 +5,12 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
-import { ToggleButtonGroup, ToggleButton, TextField } from "@mui/material";
+import {
+    ToggleButtonGroup,
+    ToggleButton,
+    TextField,
+    Slider,
+} from "@mui/material";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import useFetch from "../hooks/useFetch";
@@ -21,6 +26,8 @@ import AccessTimeFilledIcon from "@mui/icons-material/AccessTimeFilled";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import DensityMediumIcon from "@mui/icons-material/DensityMedium";
 import MergeTypeIcon from "@mui/icons-material/MergeType";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 const Schedule = () => {
     const userCtx = useContext(UserContext);
@@ -29,6 +36,8 @@ const Schedule = () => {
     const [upcomingActivities, setUpcomingActivities] = useState([]);
     const [pastActivities, setPastActivities] = useState([]);
     const [showAddActivity, setShowAddActivity] = useState(false);
+    const [showUpdateActivity, setShowUpdateActivity] = useState(false);
+    const [showDeleteActivity, setShowDeleteActivity] = useState(false);
 
     const dateRef = useRef();
     const startTimeRef = useRef();
@@ -39,8 +48,8 @@ const Schedule = () => {
     const [gameType, setGameType] = useState("Singles");
     const minPeopleRef = useRef(2);
     const maxPeopleRef = useRef(2);
-    const skillRateRef = useRef();
-    const isGamePrivateRef = useRef(false);
+    const [skillRate, setSkillRate] = useState(1.0);
+    const [isGamePrivate, setIsGamePrivate] = useState(false);
 
     // const [showCreate, setShowCreate] = useState(false);
 
@@ -115,34 +124,34 @@ const Schedule = () => {
     };
 
     const addActivity = async () => {
+        console.log("inside add activity")
         try {
-            const dateRef = dateRef.current.value;
-            const startTimeRef = startTimeRef.current.value;
-            const endTimeRef = endTimeRef.current.value;
-            const locationRef = locationRef.current.value;
-            const titleRef = titleRef.current.value;
-            const gameTypeRef = gameTypeRef.current.value;
-            const minPeopleRef = minPeople.current.value;
-            const maxPeopleRef = maxPeople.current.value;
-            const skillRateRef = skillRateRef.current.value;
-            const isGamePrivateRef = isGamePrivateRef.current.value;
+            // const dateRef = dateRef.current.value;
+            // const startTimeRef = startTimeRef.current.value;
+            // const endTimeRef = endTimeRef.current.value;
+            // const locationRef = locationRef.current.value;
+            // const titleRef = titleRef.current.value;
+            // const minPeopleRef = minPeopleRef.current.value;
+            // const maxPeopleRef = maxPeopleRef.current.value;
+            // const skillRateRef = skillRateRef.current.value;
 
+            // console.log(dateRef, startTimeRef, endTimeRef, locationRef, titleRef, minPeopleRef, maxPeopleRef )
             const res = await fetchData(
                 "/activity",
                 "POST",
                 {
                     user_id: userCtx.ActiveUserId,
-                    date: dateRef,
-                    start_time: startTimeRef,
-                    end_time: endTimeRef,
-                    location: locationRef,
-                    court_booked: isCourtBooked,
-                    title: titleRef,
+                    date: dateRef.current.value,
+                    start_time: startTimeRef.current.value,
+                    end_time: endTimeRef.current.value,
+                    location: locationRef.current.value,
+                    title: titleRef.current.value,
+                    min_people: minPeopleRef.current.value,
+                    max_people: maxPeopleRef.current.value,
                     game_type: gameType,
-                    min_people: minPeopleRef,
-                    max_people: maxPeopleRef,
-                    skill_rate: skillRateRef,
-                    game_private: isGamePrivateRef,
+                    court_booked: isCourtBooked,
+                    skill_rate: skillRate,
+                    game_private: isGamePrivate,
                 },
                 userCtx.accessToken
             );
@@ -150,6 +159,19 @@ const Schedule = () => {
             if (res.ok) {
                 getAllUpcomingActivities();
                 getAllPastActivities();
+                handleModalClose();
+                dateRef.current.value = "";
+                startTimeRef.current.value = "";
+                endTimeRef.current.value = "";
+                locationRef.current.value = "";
+                titleRef.current.value = "";
+                minPeopleRef.current.value = 2;
+                maxPeopleRef.current.value = 2;
+                setSkillRate(1.0);
+                setGameType("Singles");
+                setIsCourtBooked(false);
+                setIsGamePrivate(false);
+                alert("GAME CREATED SUCCESSFULLY!")
             } else {
                 alert(JSON.stringify(res.data));
                 console.log(res.data);
@@ -174,6 +196,16 @@ const Schedule = () => {
         setGameType(newGameType);
     };
 
+    const handleGamePrivateChange = (event) => {
+        setIsGamePrivate(event.target.checked);
+    };
+
+    const handleModalClose = () => {
+        setShowAddActivity(false);
+        setShowUpdateActivity(false);
+        setShowDeleteActivity(false);
+    };
+
     const handleActivityCardClick = async (id) => {
         try {
             await getActivityById(id);
@@ -183,6 +215,42 @@ const Schedule = () => {
             console.error(error.message);
         }
     };
+
+    const handleSkillRateChange = (event, newValue) => {
+        setSkillRate(newValue);
+    };
+    const marks = [
+        {
+            value: 1.0,
+            label: "1.0",
+        },
+        {
+            value: 2.0,
+            label: "2.0",
+        },
+        {
+            value: 3.0,
+            label: "3.0",
+        },
+        {
+            value: 4.0,
+            label: "4.0",
+        },
+        {
+            value: 5.0,
+            label: "5.0",
+        },
+        {
+            value: 6.0,
+            label: "6.0",
+        },
+        {
+            value: 7.0,
+            label: "7.0",
+        },
+    ];
+
+    const valueText = (value) => `${value}`;
 
     useEffect(() => {
         getAllUpcomingActivities();
@@ -330,8 +398,7 @@ const Schedule = () => {
                                 // border: "2px solid blue",
                                 // width: "100%",
                             }}
-
-                            // onClick={()},
+                            onClick={handleModalClose}
                         >
                             <KeyboardDoubleArrowLeftIcon />
                         </Button>
@@ -371,6 +438,21 @@ const Schedule = () => {
                             <span> - </span>
                             <input type="time" ref={endTimeRef} />
                         </Typography>
+                    </Stack>
+
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        margin="10px 0 0 0"
+                    >
+                        <LocationOnIcon />
+                        <TextField
+                            id="outlined-basic"
+                            label="Location"
+                            variant="outlined"
+                            inputRef={locationRef}
+                        />
                     </Stack>
 
                     <Stack
@@ -470,6 +552,61 @@ const Schedule = () => {
                             }}
                         />
                     </Stack>
+
+                    <Box
+                        sx={{
+                            width: 400,
+                            alignItems: "center",
+                            margin: "0px 10px 0 0",
+                        }}
+                    >
+                        <p>Skill Rate: {valueText(skillRate)}</p>
+
+                        <Slider
+                            aria-label="Restricted values"
+                            defaultValue={1.0}
+                            getAriaValueText={valueText}
+                            step={0.5}
+                            min={1.0}
+                            max={7.0}
+                            valueLabelDisplay="auto"
+                            marks={marks}
+                            value={skillRate}
+                            onChange={handleSkillRateChange}
+                            sx={{margin: "0 10px 10px 0"}}
+                        />
+                    </Box>
+
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        margin="15px 0 15px 0"
+                    >
+                        <LockOpenIcon />
+                        <Typography>
+                            <span>Mark Game as Private</span>
+                            <Switch
+                                checked={isGamePrivate}
+                                onChange={handleGamePrivateChange}
+                                inputProps={{ "aria-label": "game-private" }}
+                            />
+                        </Typography>
+                    </Stack>
+
+                    <Button
+                        size="large"
+                        color="primary"
+                        variant="contained"
+                        style={{
+                            fontSize: "0.75rem",
+                            fontWeight: "bold",
+                            width: "100%",
+                        }}
+                        onClick={addActivity}
+                    >
+                        ORGANISE TENNIS GAME
+                    </Button>
                 </div>
             )}
         </div>
