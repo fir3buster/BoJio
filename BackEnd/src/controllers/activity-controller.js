@@ -75,7 +75,7 @@ const db = database.pool;
 const getAllPublicActivities = async (req, res) => {
     try {
         console.log("inside public Controller");
-        const activeUserId = req.params.user_id
+        const activeUserId = req.params.user_id;
         const now = new Date();
         const activities = await db.query(
             `SELECT
@@ -141,16 +141,15 @@ const getAllPublicActivities = async (req, res) => {
     }
 };
 
-
 // getting upcoming activity by id (include all players that is invited where is_active = true))
 const getUpcomingActivitiesByUserId = async (req, res) => {
     const client = await db.connect();
     try {
         await client.query("BEGIN");
         const now = new Date();
-        // const userId = req.params.user_id;
+        const userId = req.params.user_id;
         // hardCODED at the moment
-        const userId = 6;
+        // const userId = 6;
 
         const activitiesId = await client.query(
             `SELECT activity_id FROM activity_user_decisions WHERE user_id = $1 AND is_active = TRUE;`,
@@ -160,9 +159,7 @@ const getUpcomingActivitiesByUserId = async (req, res) => {
         if (activitiesId.rows.length === 0) {
             await client.query("ROLLBACK");
             console.log("no activities");
-            return res
-                .status(400)
-                .json({ status: "error", msg: "error getting activities" });
+            return;
         }
 
         const ids = activitiesId.rows.map((item) => item.activity_id);
@@ -243,9 +240,9 @@ const getPastActivitiesByUserId = async (req, res) => {
     try {
         await client.query("BEGIN");
         const now = new Date();
-        // const userId = req.params.user_id;
+        const userId = req.params.user_id;
         // HARDCODED
-        const userId = 6;
+        // const userId = 6;
 
         const activitiesId = await client.query(
             `SELECT activity_id FROM activity_user_decisions WHERE user_id = $1 AND is_active = TRUE;`,
@@ -255,9 +252,7 @@ const getPastActivitiesByUserId = async (req, res) => {
         if (activitiesId.rows.length === 0) {
             await client.query("ROLLBACK");
             console.log("no activities");
-            return res
-                .status(400)
-                .json({ status: "error", msg: "error getting activities" });
+            return;
         }
 
         const ids = activitiesId.rows.map((item) => item.activity_id);
@@ -664,7 +659,7 @@ const deletePlayerById = async (req, res) => {
     try {
         const activityId = req.params.id;
         const userId = req.body.user_id;
-        console.log(userId)
+        console.log(userId);
         // Check if the record exists before attempting to delete
         const checkResult = await db.query(
             "SELECT * FROM activity_user_decisions WHERE activity_id = $1 AND user_id = $2 ;",
@@ -677,7 +672,8 @@ const deletePlayerById = async (req, res) => {
                 .json({ status: "error", msg: "Player not found" });
         }
 
-        await db.query("DELETE FROM activity_user_decisions WHERE activity_id = $1 and user_id = $2;", 
+        await db.query(
+            "DELETE FROM activity_user_decisions WHERE activity_id = $1 and user_id = $2;",
             [activityId, userId]
         );
 
@@ -700,7 +696,5 @@ module.exports = {
     updatePlayerStatusById,
     deletePlayerById,
 };
-
-
 
 //         // hardCODED at the moment => line 145,240

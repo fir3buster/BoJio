@@ -219,8 +219,8 @@ const Home = () => {
 
     useEffect(() => {
         console.log("CHECK ON USER ID: " +  userCtx.activeUserId)
-        // getAllPublicActivities(userCtx.activeUserId);
-        getAllPublicActivities(6);
+        getAllPublicActivities(userCtx.activeUserId);
+        // getAllPublicActivities(6);
         getAllActiveUsers();
         userCtx.setIsJoined(false)
     }, []);

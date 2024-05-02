@@ -30,36 +30,11 @@ const ActivitiesActionAreaCard = ({
     isJoined,
     onClick,
 }) => {
-    console.log(startTime, endTime, maxPeople, minPeople);
-    console.log(JSON.stringify(players));
+    // console.log(startTime, endTime, maxPeople, minPeople);
+    // console.log(JSON.stringify(players));
     const goingCount = players.reduce((count, player) => {
         return player.is_going ? count + 1 : count;
     }, 0);
-
-    const joinGame = async () => {
-        try {
-            const res = await fetchData(
-                "/activity/player",
-                "POST",
-                {
-                    activity_id: id,
-                    user_id: userCtx.activeUserId,
-                    is_going: true,
-                    is_active: true,
-                },
-                userCtx.accessToken
-            );
-
-            if (res.ok) {
-                alert("Join Game Successfully");
-                getDisplayActivity();
-                onClose();
-            }
-        } catch (error) {
-            alert(JSON.stringify(error.message));
-            console.log(error.message);
-        }
-    };
 
     return (
         <Card

@@ -207,7 +207,7 @@ const Play = () => {
     const handleGetActivityClick = () => {};
     const players = userCtx.displayActivity[0].playersArray;
     // const isHost = userCtx.displayActivity[0].user_id === userCtx.ActiveUserId ? true: false;
-    const isHost = userCtx.displayActivity[0].user_id === 6 ? true : false;
+    const isHost = userCtx.displayActivity[0].user_id === userCtx.activeUserId ? true : false;
     const isPast =
         new Date(userCtx.displayActivity[0].date) < new Date() ? true : false;
     console.log(userCtx.displayActivity[0].date);
@@ -297,19 +297,11 @@ const Play = () => {
     ];
 
     useEffect(() => {
-        console.log(userCtx.displayActivity);
+        console.log("check id on play:" + JSON.stringify(userCtx.displayActivity));
         if (!userCtx.displayActivity) {
             fetchActivity();
         }
     }, [id, userCtx.isJoined]); // Rerun if the ID changes
-
-    // if (isLoading) {
-    //     return <div>Loading...</div>; // Display loading state
-    // }
-
-    // if (error) {
-    //     return <div>Error: {error.message}</div>; // Display error message
-    // }
 
     return (
         <div

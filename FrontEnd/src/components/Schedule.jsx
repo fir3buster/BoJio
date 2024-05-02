@@ -303,6 +303,13 @@ const Schedule = () => {
                                 </TabList>
                             </Box>
                             <TabPanel value="1">
+                                {upcomingActivities.length === 0 && (
+                                    <>
+                                        <div>
+                                            <h1>No Activities Found</h1>
+                                        </div>
+                                    </>
+                                )}
                                 {upcomingActivities &&
                                     upcomingActivities.map((item) => (
                                         <ActivitiesActionAreaCard
@@ -326,6 +333,13 @@ const Schedule = () => {
                                     ))}
                             </TabPanel>
                             <TabPanel value="2">
+                                {pastActivities.length === 0 && (
+                                    <>
+                                        <div>
+                                            <h1>No Activities Found</h1>
+                                        </div>
+                                    </>
+                                )}
                                 {pastActivities &&
                                     pastActivities.map((item) => (
                                         <ActivitiesActionAreaCard

@@ -16,7 +16,7 @@ const UsersActionAreaCard = ({
     profilePic,
     onClick,
 }) => {
-    console.log(firstName, lastName);
+    // console.log(firstName, lastName);
     return (
         <Card
             sx={{ maxWidth: 345, height: 200, margin: "10px", boxShadow: 10 }}
