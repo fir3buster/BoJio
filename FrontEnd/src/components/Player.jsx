@@ -49,7 +49,6 @@ const Player = () => {
                 "/profile/user/" + id,
                 undefined,
                 undefined,
-                undefined,
                 userCtx.accessToken
             );
 
@@ -65,27 +64,6 @@ const Player = () => {
         }
     };
 
-    // const fetchPlayer = async () => {
-    //     try {
-    //         const res = await fetchData(
-    //             "/profile/user/" + id,
-    //             undefined,
-    //             undefined,
-    //             undefined,
-    //             userCtx.accessToken
-    //         );
-
-    //         if (res.ok) {
-    //             console.log(res.data);
-    //             userCtx.setDisplayPlayer(res.data);
-    //         } else {
-    //             alert(JSON.stringify(res.data));
-    //             console.log(res.data);
-    //         }
-    //     } catch (error) {
-    //         console.log(error.message);
-    //     }
-    // };
     // const numberFollowers = userCtx.displayFollowers.length();
     // const numberFollowing = userCtx.displayFollowers.length();
     console.log(userCtx.displayPlayer[0]);
@@ -112,48 +90,6 @@ const Player = () => {
                 alignItems: "center",
             }}
         >
-            {/* <h1>Player Details for ID: {id}</h1>
-            {JSON.stringify(userCtx.displayPlayer)}
-            <hr />
-            {JSON.stringify(userCtx.displayFollowings)}
-            <hr />
-            {JSON.stringify(userCtx.displayFollowers)}
-            <hr />
-            {JSON.stringify(userCtx.displaySportCard)}
-            <hr /> */}
-            {/* {userCtx.displayPlayer &&
-                userCtx.displayPlayer.map((item) => (
-                    <div>
-                        <div>USER PROFILE</div>
-                        <div className="title">{`Name: ${item.first_name} ${item.last_name}`}</div>
-                        <div className="activities">{`Number of Activities: `}</div>
-
-                        <div className="followers">
-                            {userCtx.displayFollowers ? (
-                                <p>{`Number of Followers: ${userCtx.displayFollowers.length}`}</p>
-                            ) : (
-                                <p>No followers available</p>
-                            )}
-                        </div>
-                        <div className="following">
-                            {userCtx.displayFollowers ? (
-                                <p>{`Number of Followings: ${userCtx.displayFollowings.length}`}</p>
-                            ) : (
-                                <p>No followings available</p>
-                            )}
-                        </div>
-                        <div className="location">{`Location: ${item.location}`}</div>
-                    </div>
-                ))} */}
-            {/* {userCtx.displaySportCard &&
-                userCtx.displaySportCard.map((item) => (
-                    <div>
-                        <div>SPORT CARD</div>
-                        <div className="skillLevel">{`Skill level: ${item.skill_level}`}</div>
-                        <div className="skillRate">{`Skill rate: ${item.skill_rate}`}</div>
-                    </div>
-                ))} */}
-
             {userCtx.displayPlayer &&
                 userCtx.displayPlayer.map((item) => (
                     <div key={item.id}>
@@ -301,26 +237,6 @@ const Player = () => {
                         >
                             <Typography variant="body2">{item.bio}</Typography>
                         </Box>
-                        {/* <Card
-                            sx={{
-                                maxWidth: 345,
-                                height: 200,
-                                margin: "10px",
-                                boxShadow: 10,
-                            }}
-                            onClick={onClick}
-                        >
-                            <CardActionArea
-                                sx={{
-                                    height: "100%",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                }}
-                            >
-                                
-                            </CardActionArea>
-                        </Card> */}
                     </div>
                 ))}
 
@@ -346,10 +262,10 @@ const Player = () => {
                             <CardContent
                                 sx={{
                                     display: "flex",
-                                    flexDirection: "column"
+                                    flexDirection: "column",
                                 }}
                             >
-                                <h6>TENNIS</h6> {/* Default centered content */}
+                                <h6>TENNIS</h6>
                                 <h2
                                     style={{
                                         marginTop: "10px", // Extra space above this element
@@ -359,15 +275,15 @@ const Player = () => {
                                 </h2>
                                 <h3
                                     style={{
-                                        display: "inline-flex", // Center content horizontally
-                                        justifyContent: "center", // Center content horizontally
-                                        alignItems: "center", // Center content vertically
-                                        border: "2px solid black", // Border to create a circle effect
-                                        borderRadius: "50%", // Circular shape
-                                        height: "50px", // Define circle size
-                                        width: "50px", // Define circle size
-                                        fontWeight: "bold", // Bold text
-                                        marginTop: "10px", // Additional space between elements
+                                        display: "inline-flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        border: "2px solid black",
+                                        borderRadius: "50%",
+                                        height: "50px",
+                                        width: "50px",
+                                        fontWeight: "bold",
+                                        marginTop: "10px",
                                     }}
                                 >
                                     {item.skill_rate === "unrated"

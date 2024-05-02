@@ -16,7 +16,7 @@ const {
 
 const { authUser } = require("../middleware/auth-middleware");
 
-router.get("/public", authUser, getAllPublicActivities);
+router.get("/public/:user_id", authUser, getAllPublicActivities);
 router.get("/upcoming/:user_id", authUser, getUpcomingActivitiesByUserId);
 router.get("/past/:user_id", authUser, getPastActivitiesByUserId);
 router.get("/:id", authUser, getActivityById);

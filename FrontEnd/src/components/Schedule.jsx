@@ -107,7 +107,6 @@ const Schedule = () => {
                 "/activity/" + id,
                 undefined,
                 undefined,
-                undefined,
                 userCtx.accessToken
             );
 
@@ -126,16 +125,6 @@ const Schedule = () => {
     const addActivity = async () => {
         console.log("inside add activity");
         try {
-            // const dateRef = dateRef.current.value;
-            // const startTimeRef = startTimeRef.current.value;
-            // const endTimeRef = endTimeRef.current.value;
-            // const locationRef = locationRef.current.value;
-            // const titleRef = titleRef.current.value;
-            // const minPeopleRef = minPeopleRef.current.value;
-            // const maxPeopleRef = maxPeopleRef.current.value;
-            // const skillRateRef = skillRateRef.current.value;
-
-            // console.log(dateRef, startTimeRef, endTimeRef, locationRef, titleRef, minPeopleRef, maxPeopleRef )
             const res = await fetchData(
                 "/activity",
                 "POST",
@@ -178,7 +167,7 @@ const Schedule = () => {
             }
         } catch (error) {
             console.log(error.message);
-            alert(JSON.stringify(error.message))
+            alert(JSON.stringify(error.message));
         }
     };
 
@@ -261,15 +250,6 @@ const Schedule = () => {
     }, [value]);
 
     return (
-        // <div>
-        //     <h1>INSIDE SCHEDULE</h1>
-        //     {userCtx.ActiveUserId}
-        //     <h2>upcoming activities</h2>
-        //     {JSON.stringify(upcomingActivities)}
-        //     <h2>Past Activities</h2>
-        //     {JSON.stringify(pastActivities)}
-
-        // </div>
         <div
             style={{
                 position: "relative",
@@ -399,7 +379,7 @@ const Schedule = () => {
                             display: "flex",
                             justifyContent: "left",
                             alignItems: "left",
-                            border: "2px solid red",
+                            // border: "2px solid red",
                         }}
                     >
                         <Button
@@ -425,12 +405,6 @@ const Schedule = () => {
                         Time & Location
                     </Typography>
                     <Stack
-                        // style={{
-                        //     // display: "flex",
-                        //     justifyContent: "left",
-                        //     alignItems: "left",
-                        //     border: "2px solid blue",
-                        // }}
                         direction="row"
                         spacing={1}
                         alignItems="center"
@@ -632,23 +606,3 @@ const Schedule = () => {
 };
 
 export default Schedule;
-
-// convert database format to javascript
-// const moment = require('moment');
-
-// time = moment('14:30', 'HH:mm');
-// formattedTime = time.format('hh:mm a');
-
-// console.log(formattedTime);  // Outputs "02:30 pm"
-
-// convert javacsript to database format
-// const moment = require('moment');
-
-// // Given a 12-hour format time with AM/PM
-// let time12hr = "02:30 pm";
-
-// // Convert to 24-hour format
-// let time24hr = moment(time12hr, "hh:mm a").format("HH:mm");
-
-// // Output the converted time
-// console.log(time24hr);  // Outputs "14:30"

@@ -18,7 +18,7 @@ const { authAdmin, authUser } = require("../middleware/auth-middleware");
 
 router.get("/activeusers", authUser, getAllActiveUsers);
 router.get("/user/:id", authUser, getUserById);
-router.patch("/user/:id", authUser, updateUserProfile);
+router.put("/user/:id", authUser, updateUserProfile);
 
 router.get("/followee/:id", authUser, getFollowingUsersById);
 router.get("/follower/:id", authUser, getFollowersById);

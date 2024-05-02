@@ -21,7 +21,6 @@ const Control = () => {
                 "/auth/users",
                 undefined,
                 undefined,
-                undefined,
                 userCtx.accessToken
             );
 

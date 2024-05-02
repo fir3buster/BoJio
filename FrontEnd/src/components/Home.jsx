@@ -42,7 +42,6 @@ const Home = () => {
                 "/activity/public/" + id,
                 undefined,
                 undefined,
-                undefined,
                 userCtx.accessToken
             );
 
@@ -65,7 +64,6 @@ const Home = () => {
             console.log("getting all active users");
             const res = await fetchData(
                 "/profile/activeusers",
-                undefined,
                 undefined,
                 undefined,
                 userCtx.accessToken
@@ -92,7 +90,6 @@ const Home = () => {
                 "/activity/" + id,
                 undefined,
                 undefined,
-                undefined,
                 userCtx.accessToken
             );
 
@@ -112,7 +109,6 @@ const Home = () => {
         try {
             const res = await fetchData(
                 "/profile/user/" + id,
-                undefined,
                 undefined,
                 undefined,
                 userCtx.accessToken
@@ -136,7 +132,6 @@ const Home = () => {
                 "/profile/following/" + id,
                 undefined,
                 undefined,
-                undefined,
                 userCtx.accessToken
             );
 
@@ -158,7 +153,6 @@ const Home = () => {
                 "/profile/follower/" + id,
                 undefined,
                 undefined,
-                undefined,
                 userCtx.accessToken
             );
 
@@ -178,7 +172,6 @@ const Home = () => {
         try {
             const res = await fetchData(
                 "/profile/sportcard/" + id,
-                undefined,
                 undefined,
                 undefined,
                 userCtx.accessToken

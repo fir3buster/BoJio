@@ -70,7 +70,6 @@ const Play = () => {
                 "/activity/" + id,
                 undefined,
                 undefined,
-                undefined,
                 userCtx.accessToken
             );
 
@@ -105,7 +104,8 @@ const Play = () => {
                     court_booked: isCourtBooked,
                     skill_rate: skillRate,
                     game_private: isGamePrivate,
-                }
+                },
+                userCtx.accessToken
             );
 
             if (res.ok) {
@@ -188,10 +188,11 @@ const Play = () => {
         }
     };
 
-
-
     const players = userCtx.displayActivity[0].playersArray;
-    const isHost = userCtx.displayActivity[0].user_id === userCtx.activeUserId ? true : false;
+    const isHost =
+        userCtx.displayActivity[0].user_id === userCtx.activeUserId
+            ? true
+            : false;
     const isPast =
         new Date(userCtx.displayActivity[0].date) < new Date() ? true : false;
     // console.log(userCtx.displayActivity[0].date);
@@ -281,7 +282,6 @@ const Play = () => {
     ];
 
     useEffect(() => {
-        console.log("check id on play:" + JSON.stringify(userCtx.displayActivity));
         if (!userCtx.displayActivity) {
             fetchActivity();
         }

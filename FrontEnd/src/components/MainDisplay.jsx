@@ -29,9 +29,7 @@ const MainDisplay = () => {
                     {/* dynamic route with parameter */}
                 </Routes>
             </div>
-            <div className={styles["right-col"]}>
-                Additional content or left empty
-            </div>
+            <div className={styles["right-col"]}></div>
         </div>
     );
 };

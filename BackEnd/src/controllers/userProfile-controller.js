@@ -65,6 +65,12 @@ const updateUserProfile = async (req, res) => {
             updatedParams.push(req.body.profile_name);
         }
 
+        if ("location" in req.body) {
+            placeholderCount++;
+            updatedFields.push(`location=$${placeholderCount}`);
+            updatedParams.push(req.body.location);
+        }
+
         if ("first_name" in req.body) {
             placeholderCount++;
             updatedFields.push(`first_name=$${placeholderCount}`);
@@ -206,9 +212,7 @@ const updateFollower = async (req, res) => {
             [followingId, followerId]
         );
 
-
         if (data.rows.length === 0) {
-
             await client.query(
                 `INSERT INTO user_followers(following_id, follower_id) VALUES ($1, $2);`,
                 [followingId, followerId]
@@ -289,9 +293,9 @@ const addSportCard = async (req, res) => {
     try {
         const userId = req.body.user_id;
         const sportType = req.body.sport_type;
-        const skillLevel = req.body.skill_level || 'beginner';
-        const skillRate = req.body.skill_rate || 'unrated';
-        
+        const skillLevel = req.body.skill_level || "beginner";
+        const skillRate = req.body.skill_rate || "unrated";
+
         await db.query(
             `INSERT INTO sports_cards (user_id, sport_type, skill_level, skill_rate ) VALUES ($1, $2, $3, $4);`,
             [userId, sportType, skillLevel, skillRate]
@@ -359,7 +363,6 @@ const updateSportCardById = async (req, res) => {
         // add the id parameter to the list
         placeholderCount++;
         updatedParams.push(id);
-
 
         // Join the updates into a single string, separated by commas
         const updatedFieldsQuery = updatedFields.join(", ");

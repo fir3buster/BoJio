@@ -23,6 +23,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import MailTwoToneIcon from "@mui/icons-material/MailTwoTone";
+import styles from "./Control.module.css";
 
 const rateArray = [
     1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0,
@@ -51,7 +52,6 @@ const Profile = () => {
                 "/profile/user/" + userCtx.activeUserId,
                 undefined,
                 undefined,
-                undefined,
                 userCtx.accessToken
             );
 
@@ -73,7 +73,6 @@ const Profile = () => {
                 "/profile/sportcard/" + userCtx.activeUserId,
                 undefined,
                 undefined,
-                undefined,
                 userCtx.accessToken
             );
 
@@ -89,9 +88,59 @@ const Profile = () => {
         }
     };
 
+    const updateUserProfile = async () => {
+        console.log(emailRef.current.value)
+        try {
+            const res = await fetchData(
+                "/profile/user/" + userProfile[0].id,
+                "PUT",
+                {
+                    email: emailRef.current.value,
+                    first_name: firstNameRef.current.value,
+                    last_name: lastNameRef.current.value,
+                    location: locationRef.current.value,
+                    bio: bioRef.current.value,
+                },
+                userCtx.accessToken
+            );
+
+            if (res.ok) {
+                alert("User updated successfully");
+                getUserProfileById();
+                // handleModalClose();
+                emailRef.current.value = "";
+                firstNameRef.current.value = "";
+                lastNameRef.current.value = "";
+                locationRef.current.value = "";
+                bioRef.current.value = "";
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
+
+    const updateSportCard = async () => {
+        try {
+            const res = await fetchData(
+                "/profile/sportcard/" + userCtx.activeUserId,
+                "PUT",
+                {
+                    skill_rate: skillRate,
+                },
+                userCtx.accessToken
+            );
+
+            if (res.ok) {
+                alert("Sport Card updated successfully");
+                getSportCardByUserId();
+                setSkillRate(rateArray[0]);
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    };
     const handleUpdateUserClick = () => {
         setShowUpdateUser(true);
-        setSkillRate();
     };
 
     const handleSkillRateChange = (event) => {
@@ -100,6 +149,13 @@ const Profile = () => {
 
     const handleModalClose = () => {
         setShowUpdateUser(false);
+        setShowUpdateSportCard(false);
+    };
+
+    const handleUpdateUserAndSportCard = async () => {
+        await updateUserProfile();
+        await updateSportCard();
+        handleModalClose();
     };
 
     useEffect(() => {
@@ -108,6 +164,7 @@ const Profile = () => {
     }, []);
 
     return (
+        
         <div
             style={{
                 position: "flex",
@@ -117,49 +174,9 @@ const Profile = () => {
                 alignItems: "center",
             }}
         >
-            {/* <h1>Player Details for ID: {id}</h1>
-            {JSON.stringify(userCtx.displayPlayer)}
-            <hr />
-            {JSON.stringify(userCtx.displayFollowings)}
-            <hr />
-            {JSON.stringify(userCtx.displayFollowers)}
-            <hr />
-            {JSON.stringify(userCtx.displaySportCard)}
-            <hr /> */}
-            {/* {userCtx.displayPlayer &&
-                userCtx.displayPlayer.map((item) => (
-                    <div>
-                        <div>USER PROFILE</div>
-                        <div className="title">{`Name: ${item.first_name} ${item.last_name}`}</div>
-                        <div className="activities">{`Number of Activities: `}</div>
-
-                        <div className="followers">
-                            {userCtx.displayFollowers ? (
-                                <p>{`Number of Followers: ${userCtx.displayFollowers.length}`}</p>
-                            ) : (
-                                <p>No followers available</p>
-                            )}
-                        </div>
-                        <div className="following">
-                            {userCtx.displayFollowers ? (
-                                <p>{`Number of Followings: ${userCtx.displayFollowings.length}`}</p>
-                            ) : (
-                                <p>No followings available</p>
-                            )}
-                        </div>
-                        <div className="location">{`Location: ${item.location}`}</div>
-                    </div>
-                ))} */}
-            {/* {userCtx.displaySportCard &&
-                userCtx.displaySportCard.map((item) => (
-                    <div>
-                        <div>SPORT CARD</div>
-                        <div className="skillLevel">{`Skill level: ${item.skill_level}`}</div>
-                        <div className="skillRate">{`Skill rate: ${item.skill_rate}`}</div>
-                    </div>
-                ))} */}
-
-            {userProfile && !showUpdateUser &&
+            {/* {JSON.stringify(userProfile)} */}
+            {userProfile &&
+                !showUpdateUser &&
                 userProfile.map((item) => (
                     <div key={item.id}>
                         {/* abc */}
@@ -304,30 +321,11 @@ const Profile = () => {
                         >
                             <Typography variant="body2">{item.bio}</Typography>
                         </Box>
-                        {/* <Card
-                            sx={{
-                                maxWidth: 345,
-                                height: 200,
-                                margin: "10px",
-                                boxShadow: 10,
-                            }}
-                            onClick={onClick}
-                        >
-                            <CardActionArea
-                                sx={{
-                                    height: "100%",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                }}
-                            >
-                                
-                            </CardActionArea>
-                        </Card> */}
                     </div>
                 ))}
 
-            {sportCard && !showUpdateUser &&
+            {sportCard &&
+                !showUpdateUser &&
                 sportCard.map((item) => (
                     <div
                         sx={{
@@ -362,15 +360,15 @@ const Profile = () => {
                                 </h2>
                                 <h3
                                     style={{
-                                        display: "inline-flex", // Center content horizontally
-                                        justifyContent: "center", // Center content horizontally
-                                        alignItems: "center", // Center content vertically
-                                        border: "2px solid black", // Border to create a circle effect
-                                        borderRadius: "50%", // Circular shape
-                                        height: "50px", // Define circle size
-                                        width: "50px", // Define circle size
-                                        fontWeight: "bold", // Bold text
-                                        marginTop: "10px", // Additional space between elements
+                                        display: "inline-flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        border: "2px solid black",
+                                        borderRadius: "50%",
+                                        height: "50px",
+                                        width: "50px",
+                                        fontWeight: "bold",
+                                        marginTop: "10px",
                                     }}
                                 >
                                     {item.skill_rate === "unrated"
@@ -396,7 +394,7 @@ const Profile = () => {
                             display: "flex",
                             justifyContent: "left",
                             alignItems: "left",
-                            border: "2px solid red",
+                            // border: "2px solid red",
                         }}
                     >
                         <Button
@@ -410,7 +408,6 @@ const Profile = () => {
                                 margin: "0 0 0 -20px",
                                 // border: "2px solid blue",
                                 // width: "100%",
-                            
                             }}
                             onClick={handleModalClose}
                         >
@@ -419,113 +416,110 @@ const Profile = () => {
                         <h4>Update Profile</h4>
                     </Box>
                     <Stack
-                        // style={{
-                        //     // display: "flex",
-                        //     justifyContent: "left",
-                        //     alignItems: "left",
-                        //     border: "2px solid blue",
-                        // }}
                         direction="row"
                         spacing={1}
                         alignItems="center"
                         margin="10px 0 0 0"
                     >
                         <CalendarMonthOutlinedIcon />
+                        <div>Email</div>
                         <Typography>
-                            <input required type="text" ref={emailRef} defaultValue={userProfile.email} />
+                            <input
+                                required
+                                type="text"
+                                ref={emailRef}
+                                defaultValue={userProfile[0].email}
+                            />
                         </Typography>
                     </Stack>
                     <Stack
-                        // style={{
-                        //     // display: "flex",
-                        //     justifyContent: "left",
-                        //     alignItems: "left",
-                        //     border: "2px solid blue",
-                        // }}
                         direction="row"
                         spacing={1}
                         alignItems="center"
                         margin="10px 0 0 0"
                     >
                         <CalendarMonthOutlinedIcon />
+                        <div>First Name</div>
                         <Typography>
-                            <input required type="text" ref={firstNameRef} defaultValue={userProfile.first_name} />
+                            <input
+                                required
+                                type="text"
+                                ref={firstNameRef}
+                                defaultValue={userProfile[0].first_name}
+                            />
                         </Typography>
                     </Stack>
                     <Stack
-                        // style={{
-                        //     // display: "flex",
-                        //     justifyContent: "left",
-                        //     alignItems: "left",
-                        //     border: "2px solid blue",
-                        // }}
                         direction="row"
                         spacing={1}
                         alignItems="center"
                         margin="10px 0 0 0"
                     >
                         <CalendarMonthOutlinedIcon />
+                        <div>Last Name</div>
                         <Typography>
-                            <input required type="text" ref={lastNameRef} defaultValue={userProfile.last_name}/>
+                            <input
+                                required
+                                type="text"
+                                ref={lastNameRef}
+                                defaultValue={userProfile[0].last_name}
+                            />
                         </Typography>
                     </Stack>
                     <Stack
-                        // style={{
-                        //     // display: "flex",
-                        //     justifyContent: "left",
-                        //     alignItems: "left",
-                        //     border: "2px solid blue",
-                        // }}
                         direction="row"
                         spacing={1}
                         alignItems="center"
                         margin="10px 0 0 0"
                     >
                         <CalendarMonthOutlinedIcon />
+                        <div>Location</div>
                         <Typography>
-                            <input required type="text" ref={locationRef} defaultValue={userProfile.location} />
+                            <input
+                                required
+                                type="text"
+                                ref={locationRef}
+                                defaultValue={userProfile[0].location}
+                            />
                         </Typography>
                     </Stack>
                     <Stack
-                        // style={{
-                        //     // display: "flex",
-                        //     justifyContent: "left",
-                        //     alignItems: "left",
-                        //     border: "2px solid blue",
-                        // }}
                         direction="row"
                         spacing={1}
                         alignItems="center"
                         margin="10px 0 0 0"
                     >
                         <CalendarMonthOutlinedIcon />
+                        <div>Gender</div>
                         <Typography>
-                            <input type="text" ref={genderRef} defaultValue={userProfile.gender} />
+                            <input
+                                type="text"
+                                ref={genderRef}
+                                defaultValue={userProfile[0].gender}
+                            />
                         </Typography>
                     </Stack>
                     <Stack
-                        // style={{
-                        //     // display: "flex",
-                        //     justifyContent: "left",
-                        //     alignItems: "left",
-                        //     border: "2px solid blue",
-                        // }}
                         direction="row"
                         spacing={1}
                         alignItems="center"
                         margin="10px 0 10px 0"
                     >
                         <CalendarMonthOutlinedIcon />
+                        <div>Bio</div>
                         <Typography>
-                            <input type="text" ref={bioRef} defaultValue={userProfile.bio} />
+                            <input
+                                type="text"
+                                ref={bioRef}
+                                defaultValue={userProfile[0].bio}
+                            />
                         </Typography>
                     </Stack>
-
                     <label htmlFor="rate-select">Select Skill Rate:</label>{" "}
                     <select
-                        id="rate-select" 
-                        value={skillRate} 
-                        onChange={handleSkillRateChange} 
+                        id="rate-select"
+                        value={skillRate}
+                        onChange={handleSkillRateChange}
                     >
                         {rateArray.map((rate, index) => (
                             <option key={index} value={rate}>
@@ -533,6 +527,13 @@ const Profile = () => {
                             </option>
                         ))}
                     </select>
+                    <button
+                        className={`btn btn-danger btn-sm ${styles.userButton}`}
+                        type="button"
+                        onClick={handleUpdateUserAndSportCard}
+                    >
+                        Submit
+                    </button>
                 </div>
             )}
         </div>
