@@ -5,7 +5,6 @@ const db = database.pool;
 const getAllRoles = async (req, res) => {
     try {
         const roles = await db.query("SELECT * FROM roles")
-        console.log(roles.rows)
         res.json(roles.rows.map((item) => item.role_type));
     } catch (error) {
         console.error(error.message);

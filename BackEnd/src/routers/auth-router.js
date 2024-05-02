@@ -7,12 +7,10 @@ const { errorCheck } = require("../validators/errorsCheck");
 const { authAdmin } = require("../middleware/auth-middleware");
 
 
-router.get("/users", getAllUsers );
+router.get("/users", authAdmin, getAllUsers );
 router.put("/register", validateRegistrationData, errorCheck, register);
 router.post("/login", validateLoginData, errorCheck, login)
 router.post("/refresh", validateRefreshToken, errorCheck, refresh)
 
 module.exports = router;
 
-
-// router.get("/users", authAdmin, getAllUsers );

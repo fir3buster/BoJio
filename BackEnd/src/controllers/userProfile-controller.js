@@ -18,7 +18,7 @@ const getAllActiveUsers = async (req, res) => {
             WHERE is_active = true      
             ORDER BY user_profiles.id ASC;`
         );
-        console.log(users.rows, typeof users.rows);
+
         res.status(200).json(users.rows);
     } catch (error) {
         console.error(error.message);
@@ -206,23 +206,21 @@ const updateFollower = async (req, res) => {
             [followingId, followerId]
         );
 
-        console.log(data.rows);
+
         if (data.rows.length === 0) {
-            console.log("new user_follower data");
+
             await client.query(
                 `INSERT INTO user_followers(following_id, follower_id) VALUES ($1, $2);`,
                 [followingId, followerId]
             );
         } else if (data.rows.length === 1) {
             let newIsActive = "";
-            console.log("to update user_follower data");
             if (data.rows[0].is_active === true) {
                 newIsActive = false;
             } else if (data.rows[0].is_active === false) {
                 newIsActive = true;
             } else {
                 await client.query("ROLLBACK");
-                console.log("undefined value");
                 res.status(400).json({
                     status: "error",
                     msg: "undefined value in is_active",
@@ -234,7 +232,6 @@ const updateFollower = async (req, res) => {
             );
         } else {
             await client.query("ROLLBACK");
-            console.log("Multiple data detected!");
             res.status(400).json({
                 status: "error",
                 msg: "multiple data detected!",
@@ -328,11 +325,8 @@ const updateSportCardById = async (req, res) => {
             [id, sportType]
         );
 
-        console.log(sportCard.rows)
-
         if (sportCard.rows.length === 0) {
             await client.query("ROLLBACK");
-            console.log("no sport card found");
             return res
                 .status(400)
                 .json({ status: "error", msg: "no sport card found" });

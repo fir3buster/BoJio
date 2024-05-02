@@ -1,0 +1,26 @@
+/* Style for CardContent to center text */
+.skillCardContent {
+    display: flex;
+    flex-direction: column; /* Arrange vertically */
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically */
+    text-align: center; /* Ensure text is centered */
+}
+
+/* Style for skill level with more gap between them */
+.skillLevel {
+    margin-top: 10px; /* Adjust spacing as needed */
+}
+
+/* Style for skill rate with circle and border */
+.skillRate {
+    display: inline-flex; /* Ensures content is centered */
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Centers content vertically */
+    border: 2px solid black; /* Creates a border around the circle */
+    border-radius: 50%; /* Makes it circular */
+    height: 30px; /* Set a fixed height and width */
+    width: 30px; /* Set a fixed width */
+    font-weight: bold; /* Optionally bolden the text */
+    margin-top: 10px; /* Add space between elements */
+}

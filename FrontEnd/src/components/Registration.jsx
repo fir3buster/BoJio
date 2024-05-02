@@ -115,7 +115,6 @@ const Registration = (props) => {
                     <div className=""></div>
                 </div>
 
-                {JSON.stringify(roles)}
                 <select className="selection">
                     <option value="none">Please select your role</option>
                     {roles.map((item) => {

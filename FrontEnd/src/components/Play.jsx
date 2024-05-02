@@ -62,18 +62,6 @@ const Play = () => {
     const navigate = useNavigate();
 
     console.log(JSON.stringify(userCtx.displayActivity));
-    // const handleToggle = () => {
-    //     setGamePrivate(!gamePrivate); // Toggle the boolean value
-    // };
-
-    // const handleSliderChange = (event, newValue, name) => {
-    //     // Slider component will send a new value
-    //     if (name === "minPeople") {
-    //         setMinPeople(newValue);
-    //     } else if (name === "maxPeople") {
-    //         setMaxPeople(newValue);
-    //     }
-    // };
 
     // refetch activity if displayActivity state is none
     const fetchActivity = async () => {
@@ -200,18 +188,15 @@ const Play = () => {
         }
     };
 
-    // const handleAddActivityClick = () => {
-    //     setShowCreate(true);
-    // };
+
 
     const players = userCtx.displayActivity[0].playersArray;
-    // const isHost = userCtx.displayActivity[0].user_id === userCtx.ActiveUserId ? true: false;
     const isHost = userCtx.displayActivity[0].user_id === userCtx.activeUserId ? true : false;
     const isPast =
         new Date(userCtx.displayActivity[0].date) < new Date() ? true : false;
-    console.log(userCtx.displayActivity[0].date);
-    console.log(new Date() > new Date(userCtx.displayActivity[0].date));
-    console.log("CHECK past date boolean: " + isPast);
+    // console.log(userCtx.displayActivity[0].date);
+    // console.log(new Date() > new Date(userCtx.displayActivity[0].date));
+    // console.log("CHECK past date boolean: " + isPast);
     const goingCount = players.reduce((count, player) => {
         return player.is_going ? count + 1 : count;
     }, 0);
@@ -310,33 +295,10 @@ const Play = () => {
                 // border: "2px solid black",
             }}
         >
-            {/* <h1>Activity Details for ID: {id}</h1>
-            {JSON.stringify(userCtx.displayActivity)}
-            <hr /> */}
             {userCtx.displayActivity &&
                 !showUpdateActivity &&
                 userCtx.displayActivity.map((item) => (
                     <div>
-                        {/* <div>
-                            <div>ACTIVITIES</div>
-                            <div>Title: {item.title}</div>
-                            <div>Location: {item.location}</div>
-                            <div>Date: {item.date}</div>
-                            <div>startTime: {item.start_time}</div>
-                            <div>endTime: {item.end_time}</div>
-                            <div>isBooked: {item.court_Booked}</div>
-                            <div>GameType: {item.game_type}</div>
-                            <div>Min: {item.min_player}</div>
-                            <div>Max: {item.max_player}</div>
-                            <div>Skill: {item.skill_rate}</div>
-                            <div>Private: {item.game_private}</div>
-                            <div>
-                                players:{" "}
-                                {item.playersArray.map((player) => (
-                                    <div>{player.id}</div>
-                                ))}
-                            </div>
-                        </div> */}
                         <div>
                             <Stack
                                 direction="row"

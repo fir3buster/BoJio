@@ -241,8 +241,6 @@ const getPastActivitiesByUserId = async (req, res) => {
         await client.query("BEGIN");
         const now = new Date();
         const userId = req.params.user_id;
-        // HARDCODED
-        // const userId = 6;
 
         const activitiesId = await client.query(
             `SELECT activity_id FROM activity_user_decisions WHERE user_id = $1 AND is_active = TRUE;`,
@@ -697,4 +695,3 @@ module.exports = {
     deletePlayerById,
 };
 
-//         // hardCODED at the moment => line 145,240

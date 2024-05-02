@@ -16,28 +16,16 @@ const {
 
 const { authUser } = require("../middleware/auth-middleware");
 
-router.get("/public/:user_id", getAllPublicActivities);
-router.get("/upcoming/:user_id", getUpcomingActivitiesByUserId);
-router.get("/past/:user_id", getPastActivitiesByUserId);
-router.get("/:id", getActivityById);
-router.post("/", addActivity);
-router.put("/:id", updateActivityById);
-router.delete("/:id", deleteActivityById);
+router.get("/public", authUser, getAllPublicActivities);
+router.get("/upcoming/:user_id", authUser, getUpcomingActivitiesByUserId);
+router.get("/past/:user_id", authUser, getPastActivitiesByUserId);
+router.get("/:id", authUser, getActivityById);
+router.post("/", authUser, addActivity);
+router.put("/:id", authUser, updateActivityById);
+router.delete("/:id", authUser, deleteActivityById);
 
-router.post("/player", addPlayer);
-router.put("/player/:id", updatePlayerStatusById);
-router.delete("/player/:id", deletePlayerById);
+router.post("/player", authUser, addPlayer);
+router.put("/player/:id", authUser, updatePlayerStatusById);
+router.delete("/player/:id", authUser, deletePlayerById);
 
 module.exports = router;
-
-// router.get("/public", authUser, getAllPublicActivities);
-// router.get("/upcoming/:user_id", authUser, getUpcomingActivitiesByUserId);
-// router.get("/past/:user_id", authUser, getPastActivitiesByUserId);
-// router.get("/:id", authUser, getActivityById);
-// router.post("/", authUser, addActivity);
-// router.update("/:id", authUser, updateActivityById);
-// router.delete("/:id", authUser, deleteActivityById);
-
-// router.post("/player", authUser, addPlayer);
-// router.put("/player/:id", authUser, updatePlayerStatusById);
-// router.delete("/player/:id", authUser, deletePlayerById);

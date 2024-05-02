@@ -10,15 +10,29 @@ const getAllUsers = async (req, res) => {
     try {
         console.log("inside Controller");
         const users = await db.query(
-            "SELECT * FROM user_profiles ORDER BY id ASC;"
+            `SELECT 
+                up.id, 
+                up.email, 
+                up.profile_name, 
+                up.first_name, 
+                up.last_name, 
+                up.profile_picture_url, 
+                up.bio, 
+                up.gender, 
+                up.role, 
+                admin_user_data.user_id, 
+                admin_user_data.is_active 
+            FROM 
+                user_profiles up 
+            JOIN
+                admin_user_data
+            ON 
+                up.id = admin_user_data.user_id 
+            WHERE 
+                admin_user_data.is_active = TRUE;`
         );
 
-        // const outputArray = [];
-
-        // for (const user of users) {
-        //     outputArray.push({id:user.id, email:user.email, role:user.role})
-        // }
-        console.log(users.rows, typeof users.rows);
+        // console.log(users.rows, typeof users.rows);
         res.status(200).json(users.rows);
     } catch (error) {
         console.error(error.message);
@@ -29,28 +43,28 @@ const getAllUsers = async (req, res) => {
 // registering user
 const register = async (req, res) => {
     const colors = [
-        deepOrange,
-        deepPurple,
-        teal,
-        indigo,
-        red,
-        blue,
-        green,
-        orange,
-        pink,
-        yellow,
+        "deepOrange",
+        "deepPurple",
+        "teal",
+        "indigo",
+        "red",
+        "blue",
+        "green",
+        "orange",
+        "pink",
+        "yellow",
     ];
-    const client = await db.connect(); // explicitly acquire connection for multiple queries
+    const client = await db.connect(); 
     try {
         await client.query("BEGIN");
 
         const email = req.body.email;
         const role = req.body.role || "user";
-        // console.log(email, profile_name);
         const firstName = req.body.firstName;
         const lastName = req.body.lastName;
-        const profileName = (firstName[0] + lastName[0]).upper();
-        const profileColor = getRandomItem(colors)
+        const profileName = (firstName[0] + lastName[0]).toUpperCase();
+        const profileColor = getRandomItem(colors);
+        const location = req.body.location;
 
         // check for duplicate
         const auth = await client.query(
@@ -71,8 +85,17 @@ const register = async (req, res) => {
 
         // Insert user_profile into user_profiles table
         const userResult = await client.query(
-            "INSERT INTO user_profiles(email, hashed_password, first_name, last_name, profile_name, profile_picture_url, role) VALUES ($1, $2, $3, $4, $5) RETURNING id;",
-            [email, hash, firstName, lastName, profileName, profileColor, role]
+            "INSERT INTO user_profiles(email, hashed_password, first_name, last_name, profile_name, profile_picture_url, role, location) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id;",
+            [
+                email,
+                hash,
+                firstName,
+                lastName,
+                profileName,
+                profileColor,
+                role,
+                location,
+            ]
         );
         console.log(userResult.rows);
 
@@ -103,7 +126,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        console.log("inside login controller");
+        // console.log("inside login controller");
         // check if email already registered
         const email = req.body.email;
         const password = req.body.password;
@@ -127,7 +150,6 @@ const login = async (req, res) => {
         }
 
         const auth_content = auth.rows[0];
-        console.log(auth_content, typeof auth_content);
 
         // result returning boolean (true or false)
         const result = await bcrypt.compare(
@@ -181,7 +203,6 @@ const refresh = async (req, res) => {
             jwtid: uuidv4(),
         });
 
-        console.log(access);
         res.json({ access });
     } catch (error) {
         console.error(error.message);

@@ -178,6 +178,7 @@ const Schedule = () => {
             }
         } catch (error) {
             console.log(error.message);
+            alert(JSON.stringify(error.message))
         }
     };
 
