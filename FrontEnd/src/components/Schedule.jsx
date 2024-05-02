@@ -1,24 +1,24 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ActivitiesActionAreaCard from "./ActivitiesActionAreaCard";
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
-import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import {
     ToggleButtonGroup,
     ToggleButton,
     TextField,
     Slider,
+    Button,
+    Switch,
+    Typography,
+    Divider,
+    Box,
+    Stack,
+    Tab,
 } from "@mui/material";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import useFetch from "../hooks/useFetch";
 import UserContext from "../context/user";
-import Button from "@mui/material/Button";
-import Switch from "@mui/material/Switch";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
 import moment from "moment";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
@@ -27,7 +27,7 @@ import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import DensityMediumIcon from "@mui/icons-material/DensityMedium";
 import MergeTypeIcon from "@mui/icons-material/MergeType";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 const Schedule = () => {
     const userCtx = useContext(UserContext);
@@ -39,12 +39,12 @@ const Schedule = () => {
     const [showUpdateActivity, setShowUpdateActivity] = useState(false);
     const [showDeleteActivity, setShowDeleteActivity] = useState(false);
 
-    const dateRef = useRef();
-    const startTimeRef = useRef();
-    const endTimeRef = useRef();
-    const locationRef = useRef();
+    const dateRef = useRef("");
+    const startTimeRef = useRef("");
+    const endTimeRef = useRef("");
+    const locationRef = useRef("");
     const [isCourtBooked, setIsCourtBooked] = useState(false);
-    const titleRef = useRef();
+    const titleRef = useRef("");
     const [gameType, setGameType] = useState("Singles");
     const minPeopleRef = useRef(2);
     const maxPeopleRef = useRef(2);
@@ -124,7 +124,7 @@ const Schedule = () => {
     };
 
     const addActivity = async () => {
-        console.log("inside add activity")
+        console.log("inside add activity");
         try {
             // const dateRef = dateRef.current.value;
             // const startTimeRef = startTimeRef.current.value;
@@ -171,7 +171,7 @@ const Schedule = () => {
                 setGameType("Singles");
                 setIsCourtBooked(false);
                 setIsGamePrivate(false);
-                alert("GAME CREATED SUCCESSFULLY!")
+                alert("GAME CREATED SUCCESSFULLY!");
             } else {
                 alert(JSON.stringify(res.data));
                 console.log(res.data);
@@ -219,6 +219,7 @@ const Schedule = () => {
     const handleSkillRateChange = (event, newValue) => {
         setSkillRate(newValue);
     };
+
     const marks = [
         {
             value: 1.0,
@@ -422,7 +423,7 @@ const Schedule = () => {
                     >
                         <CalendarMonthOutlinedIcon />
                         <Typography>
-                            <input type="date" ref={dateRef} />
+                            <input required type="date" ref={dateRef} />
                         </Typography>
                     </Stack>
 
@@ -434,9 +435,9 @@ const Schedule = () => {
                     >
                         <AccessTimeFilledIcon />
                         <Typography>
-                            <input type="time" ref={startTimeRef} />
+                            <input required type="time" ref={startTimeRef} />
                             <span> - </span>
-                            <input type="time" ref={endTimeRef} />
+                            <input required type="time" ref={endTimeRef} />
                         </Typography>
                     </Stack>
 
@@ -451,6 +452,7 @@ const Schedule = () => {
                             id="outlined-basic"
                             label="Location"
                             variant="outlined"
+                            required
                             inputRef={locationRef}
                         />
                     </Stack>
@@ -489,6 +491,7 @@ const Schedule = () => {
                             id="outlined-basic"
                             label="Title"
                             variant="outlined"
+                            required
                             inputRef={titleRef}
                         />
                     </Stack>
@@ -573,7 +576,7 @@ const Schedule = () => {
                             marks={marks}
                             value={skillRate}
                             onChange={handleSkillRateChange}
-                            sx={{margin: "0 10px 10px 0"}}
+                            sx={{ margin: "0 10px 10px 0" }}
                         />
                     </Box>
 

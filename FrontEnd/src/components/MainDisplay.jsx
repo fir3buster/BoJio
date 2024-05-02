@@ -18,10 +18,10 @@ const MainDisplay = () => {
             <div className={styles["center-col"]}>
                 <Routes>
                     <Route path="/" element={<Navigate replace to="/home" />} />
-                    <Route path="home" element={<Home />} />
-                    <Route path="feed" element={<Feed />} />
-                    <Route path="schedule" element={<Schedule />} />
-                    <Route path="profile" element={<Profile />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/feed" element={<Feed />} />
+                    <Route path="/schedule" element={<Schedule />} />
+                    <Route path="/profile" element={<Profile />} />
                     <Route path="/play/:id" element={<Play />} />
                     <Route path="/player/:id" element={<Player />} />
                     {/* dynamic route with parameter */}

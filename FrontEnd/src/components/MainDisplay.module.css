@@ -16,16 +16,20 @@
 }
 
 .left-col {
-    background-color: whitesmoke;
+    background-color: rgb(187, 187, 203);
     height: 100%;
 }
 
 .center-col {
-    background-color: #b4b0b0; 
+    /* background-color: #b4b0b0; */
+    /* border: 2px solid black; */
+    background-color: rgb(224, 224, 224); 
     padding: 2rem; 
     overflow-y: auto;
 }
 
 .right-col {
-    background-color: transparent; 
+    background-color: rgb(224, 224, 224); 
+    border-left: 2px solid rgb(187, 187, 203);
+    /* background-color: rgba(228, 228, 234, 0.93); */
 }
