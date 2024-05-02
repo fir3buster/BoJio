@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import useFetch from "../hooks/useFetch";
 import UserContext from "../context/user";
 import { jwtDecode } from "jwt-decode";
-// import logo from "../ts_logo.png";
+import logo from "../bojio-logo.png";
 
 const Login = (props) => {
     const fetchData = useFetch();
@@ -44,7 +44,7 @@ const Login = (props) => {
         <>
             <br />
             <div className="login">
-                {/* <img src={logo} className="logo"></img> */}
+                <img src={logo} className="logo"></img>
                 <div className="">
                     <div className=""></div>
                     <input

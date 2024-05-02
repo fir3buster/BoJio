@@ -67,98 +67,105 @@ button:focus-visible {
   }
 } */
 
-
-
 * {
     box-sizing: border-box;
-  }
-  
-  html {
+}
+
+html {
     font-family: "Oxygen", sans-serif;
-  }
-  
-  body {
+}
+
+body {
     margin: 0;
     background-color: #1a1a1a;
     color: black;
-  }
-  
-  /* .centered {
+}
+
+/* .centered {
     margin: 3rem auto;
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
   } */
-  
-  .chartandbuttons {
+
+.chartandbuttons {
     left: 300px;
-  }
-  
-  .header {
+}
+
+.header {
     height: 100px;
     background-color: black;
-  }
-  
-  .logo {
+}
+
+.logo {
     width: 500px;
-    margin: 50px;
-  }
-  
-  .login {
+    margin: 30px 0 -25px 0;
+}
+
+.login {
     text-align: center;
-  }
-  
-  .email {
-    width: 500px;
-    margin: 10px;
-    border-radius: 3px;
-    height: 40px;
-  }
-  
-  .password {
-    width: 500px;
-    border-radius: 3px;
-    height: 40px;
-  }
+    justify-content: center;
+    align-items: center;
+}
 
-  .firstLastName {
+.email {
+    width: 350px;
+    margin: 5px;
+    border-radius: 3px;
+    height: 40px;
+}
+
+.password {
+    width: 350px;
+    border-radius: 3px;
+    height: 40px;
+}
+
+.location {
+    width: 350px;
+    border-radius: 3px;
+    height: 40px;
+    margin-top: 3px;
+}
+
+.firstLastName {
     display: inline-block;
-  }
+}
 
-  .firstName,
-  .lastName {
-    margin-right: 5px;
-    width: 175px;
+.firstName,
+.lastName {
+    margin-top: 3px;
+    margin-right: 3px;
+    width: 173px;
     border-radius: 3px;
     height: 40px;
-  }
+}
 
-  .loginButton {
-    width: 500px;
+.loginButton {
+    width: 200px;
     margin: 30px;
     height: 40px;
     border-radius: 30px;
     border: none;
-    background-color: #01c187;
+    background-color: rgb(54, 129, 186);
     color: white;
     font-weight: bold;
     font-size: 20px;
-  }
-  
-  .goToRegisterButton {
+}
+
+.goToRegisterButton {
     background-color: #1a1a1a;
     color: white;
     cursor: pointer;
     border: none;
     font-size: 20px;
     border-bottom: 1px solid white;
-  }
-  
-  .selection {
+}
+
+.selection {
     width: 175px;
     height: 40px;
     margin-top: 10px;
     border-radius: 3px;
-  }
-  
+}

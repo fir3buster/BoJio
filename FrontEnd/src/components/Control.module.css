@@ -1,0 +1,39 @@
+stock-list-container {
+    width: 100%;
+    background-color: lightgray;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 10px 5px;
+}
+
+.user-header,
+.user-item {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) 0.5fr 0.5fr;
+    gap: 10px;
+    padding: 0px 0px;
+    border-bottom: 1px solid aliceblue;
+    align-items: center;
+    justify-items: center;
+}
+
+.user-header {
+    font-weight: bold;
+}
+
+.user-item {
+    align-items: center;
+    justify-items: center;
+}
+
+/* .image {
+    display: flex;
+    margin-right: 10px;
+    width:25px;
+    background:inherit;
+} */
+
+.userButton {
+    display: flex;
+    margin: 4px 5px;
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
-// import logo from "../ts_logo.png";
+import logo from "../bojio-logo.png";
 
 const Registration = (props) => {
     const fetchData = useFetch();
@@ -54,7 +54,7 @@ const Registration = (props) => {
         <>
             <br />
             <div className="login">
-                {/* <img src={logo} className="logo"></img> */}
+                <img src={logo} className="logo"></img>
                 <div className="">
                     <div className=""></div>
                     <input
@@ -90,7 +90,7 @@ const Registration = (props) => {
                     />
                     <div className=""></div>
                 </div>
-                
+
                 <div className="firstLastName">
                     <div className=""></div>
                     <input
@@ -114,7 +114,8 @@ const Registration = (props) => {
                     />
                     <div className=""></div>
                 </div>
-                
+
+                {JSON.stringify(roles)}
                 <select className="selection">
                     <option value="none">Please select your role</option>
                     {roles.map((item) => {
@@ -125,7 +126,7 @@ const Registration = (props) => {
                         );
                     })}
                 </select>
-                
+
                 <div className="">
                     <div className=""></div>
                     <button

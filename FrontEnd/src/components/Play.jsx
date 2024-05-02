@@ -204,7 +204,6 @@ const Play = () => {
     //     setShowCreate(true);
     // };
 
-    const handleGetActivityClick = () => {};
     const players = userCtx.displayActivity[0].playersArray;
     // const isHost = userCtx.displayActivity[0].user_id === userCtx.ActiveUserId ? true: false;
     const isHost = userCtx.displayActivity[0].user_id === userCtx.activeUserId ? true : false;

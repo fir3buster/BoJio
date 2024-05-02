@@ -5,6 +5,7 @@ import Home from "./Home";
 import Feed from "./Feed";
 import Schedule from "./Schedule";
 import Profile from "./Profile";
+import Control from "./Control";
 import styles from "./MainDisplay.module.css";
 import Play from "./Play";
 import Player from "./Player";
@@ -22,6 +23,7 @@ const MainDisplay = () => {
                     <Route path="/feed" element={<Feed />} />
                     <Route path="/schedule" element={<Schedule />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/control" element={<Control />} />
                     <Route path="/play/:id" element={<Play />} />
                     <Route path="/player/:id" element={<Player />} />
                     {/* dynamic route with parameter */}
