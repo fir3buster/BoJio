@@ -126,7 +126,7 @@ const Schedule = () => {
         console.log("inside add activity");
         try {
             const res = await fetchData(
-                "/activity",
+                "/activity/add",
                 "POST",
                 {
                     user_id: userCtx.activeUserId,
@@ -199,7 +199,7 @@ const Schedule = () => {
     const handleActivityCardClick = async (id) => {
         try {
             await getActivityById(id);
-            userCtx.setIsJoined(true);
+            // userCtx.setIsJoined(true);
             navigate(`/play/${id}`);
         } catch (error) {
             console.error(error.message);
@@ -284,13 +284,14 @@ const Schedule = () => {
                                 </TabList>
                             </Box>
                             <TabPanel value="1">
-                                {upcomingActivities.length === 0 && (
+                                {/* {JSON.stringify(upcomingActivities)} */}
+                                {/* {upcomingActivities.length === 0 && (
                                     <>
                                         <div>
                                             <h1>No Activities Found</h1>
                                         </div>
                                     </>
-                                )}
+                                )} */}
                                 {upcomingActivities &&
                                     upcomingActivities.map((item) => (
                                         <ActivitiesActionAreaCard
@@ -314,13 +315,13 @@ const Schedule = () => {
                                     ))}
                             </TabPanel>
                             <TabPanel value="2">
-                                {pastActivities.length === 0 && (
+                                {/* {pastActivities.length === 0 && (
                                     <>
                                         <div>
                                             <h1>No Activities Found</h1>
                                         </div>
                                     </>
-                                )}
+                                )} */}
                                 {pastActivities &&
                                     pastActivities.map((item) => (
                                         <ActivitiesActionAreaCard

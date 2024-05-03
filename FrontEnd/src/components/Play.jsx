@@ -57,6 +57,7 @@ const Play = () => {
     const maxPeopleRef = useRef(2);
     const [skillRate, setSkillRate] = useState(1.0);
     const [isGamePrivate, setIsGamePrivate] = useState(false);
+    const [showInvite, setShowInvite] = useState(true)
 
     const fetchData = useFetch();
     const navigate = useNavigate();
@@ -157,6 +158,7 @@ const Play = () => {
             if (res.ok) {
                 alert("Joined Game Successfully");
                 userCtx.setIsJoined(true);
+                setShowInvite(false)
                 fetchActivity();
             }
         } catch (error) {
@@ -189,12 +191,15 @@ const Play = () => {
     };
 
     const players = userCtx.displayActivity[0].playersArray;
+    const activePlayerStatus = userCtx.displayActivity[0].playersArray.filter((player) => player.user_id === userCtx.activeUserId)
+
     const isHost =
         userCtx.displayActivity[0].user_id === userCtx.activeUserId
             ? true
             : false;
     const isPast =
         new Date(userCtx.displayActivity[0].date) < new Date() ? true : false;
+    const isInvited = activePlayerStatus.length > 0 ? !isHost && !activePlayerStatus[0].is_going : null;
     // console.log(userCtx.displayActivity[0].date);
     // console.log(new Date() > new Date(userCtx.displayActivity[0].date));
     // console.log("CHECK past date boolean: " + isPast);
@@ -495,7 +500,7 @@ const Play = () => {
 
                                 <Stack direction="row" spacing={2}>
                                     {item.playersArray.map((player) =>
-                                        !player.is_going ? (
+                                        !player.is_going && showInvite ? (
                                             <Stack
                                                 direction="column"
                                                 alignItems="center"
@@ -557,7 +562,22 @@ const Play = () => {
                 >
                     INVITE PLAYERS
                 </Button>
-            ) : userCtx.isJoined ? (
+            ) : isInvited ? (
+                <Button
+                    size="large"
+                    color="primary"
+                    variant="contained"
+                    style={{
+                        position: "absolute",
+                        bottom: "-15px",
+                        fontSize: "0.75rem",
+                        fontWeight: "bold",
+                        width: "100%",
+                    }}
+                    onClick={joinGame}
+                >
+                    JOIN
+                </Button>) : userCtx.isJoined ? (
                 <Button
                     size="large"
                     color="primary"

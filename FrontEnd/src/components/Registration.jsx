@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useFetch from "../hooks/useFetch";
-import logo from "../bojio-logo.png";
+import logo from "../td.png"; 
+
 
 const Registration = (props) => {
     const fetchData = useFetch();
@@ -23,6 +24,7 @@ const Registration = (props) => {
     };
 
     const registerUser = async () => {
+        console.log(role)
         const res = await fetchData("/auth/register", "PUT", {
             email,
             password,
@@ -115,8 +117,14 @@ const Registration = (props) => {
                     <div className=""></div>
                 </div>
 
-                <select className="selection">
-                    <option value="none">Please select your role</option>
+                <select
+                    name="roles"
+                    id="roles"
+                    className="selection"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                >
+                    <option value="none">please select</option>
                     {roles.map((item) => {
                         return (
                             <option key={item} value={item}>

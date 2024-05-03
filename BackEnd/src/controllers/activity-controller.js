@@ -159,7 +159,9 @@ const getUpcomingActivitiesByUserId = async (req, res) => {
         if (activitiesId.rows.length === 0) {
             await client.query("ROLLBACK");
             console.log("no activities");
-            return;
+            return res
+                .status(200)
+                .json({ status: "error", msg: "no activities found" });
         }
 
         const ids = activitiesId.rows.map((item) => item.activity_id);
@@ -250,7 +252,9 @@ const getPastActivitiesByUserId = async (req, res) => {
         if (activitiesId.rows.length === 0) {
             await client.query("ROLLBACK");
             console.log("no activities");
-            return;
+            return res
+                .status(200)
+                .json({ status: "error", msg: "no activities found" });
         }
 
         const ids = activitiesId.rows.map((item) => item.activity_id);
@@ -380,12 +384,13 @@ const getActivityById = async (req, res) => {
 
 const addActivity = async (req, res) => {
     const client = await db.connect();
+    console.log("backend");
     try {
         await client.query("BEGIN");
 
         const userId = req.body.user_id;
         const sportType = req.body.sport_type || "tennis";
-        const gameType = req.body.game_type || "singles";
+        const gameType = req.body.game_type || "single";
         const title = req.body.title;
         const date = req.body.date;
         const startTime = req.body.start_time;
@@ -694,4 +699,3 @@ module.exports = {
     updatePlayerStatusById,
     deletePlayerById,
 };
-
