@@ -12,59 +12,59 @@
     <h3>Landing Page </h3>
     <div style="display: flex; align-items: center;">
         <div style="margin-right: 20px; text-align: center;">
-            <img src="./assets/login.png" alt="login" width="450" height="300">
+            <img src="./assets/login.png" alt="login" width="400" height="300">
             <p>Login Page</p>
         </div>
         <div style="text-align: center;">
-            <img src="./assets/register.png" alt="registration" width="450" height="300">
+            <img src="./assets/register.png" alt="registration" width="400" height="300">
             <p>Registration Page</p>
         </div>
     </div>
     <h3>Home Page </h3>
     <div style="display: flex; align-items: center;">
         <div style="margin-right: 20px; text-align: center;">
-            <img src="./assets/home.png" alt="homepage" width="450" height= "300"> 
+            <img src="./assets/home.png" alt="homepage" width="400" height= "300"> 
             <p>home page</p>
         </div>
         <div style="text-align: center;">
-            <img src="./assets/gameview.png" alt="viewing a public game" width="450" height= "300">
+            <img src="./assets/gameview.png" alt="viewing a public game" width="400" height= "300">
             <p>public game view</p>
         </div>
     </div>
     <div style="display: flex; align-items: center;">
         <div style="margin-right: 20px; text-align: center;">
-            <img src="./assets/gameviewleave.png" alt="leave a game" width="450" height= "300">
+            <img src="./assets/gameviewleave.png" alt="leave a game" width="400" height= "300">
             <p>leaving a game view</p>
         </div>
         <div style="text-align: center;">
-            <img src="./assets/profileview.png" alt="viewing a public profile" width="450" height= "300">
+            <img src="./assets/profileview.png" alt="viewing a public profile" width="400" height= "300">
             <p>public profile view</p>
         </div>
     </div>
     <h3>Schedule </h3>
     <div style="display: flex; align-items: center;">
         <div style="margin-right: 20px; text-align: center;">
-            <img src="./assets/scheduleupcoming.png" alt="viewing upcoming activities" width="450" height= "300"> 
+            <img src="./assets/scheduleupcoming.png" alt="viewing upcoming activities" width="400" height= "300"> 
             <p>viewing upcoming activities of the user tab</p>
         </div>
         <div style="text-align: center;">
-            <img src="./assets/schedulehistory.png" alt="viewing past activities" width="450" height= "300">
+            <img src="./assets/schedulehistory.png" alt="viewing past activities" width="400" height= "300">
             <p>viewing past activities of the user tab</p>
         </div>
     </div>
     <div style="display: flex; align-items: center;">
         <div style="margin-right: 20px; text-align: center;">
-            <img src="./assets/organisegame.png" alt="organise a game" width="450" height= "300">
+            <img src="./assets/organisegame.png" alt="organise a game" width="400" height= "300">
             <p>organise a game view</p>
         </div>
         <div style="margin-right: 20px; text-align: center;">
-            <img src="./assets/hostgame.png" alt="game view as a host" width="450" height= "300"> 
+            <img src="./assets/hostgame.png" alt="game view as a host" width="400" height= "300"> 
             <p>game view as a host</p>
         </div>
     </div>
     <div style="display: flex; align-items: center;">
         <div style="text-align: center;">
-            <img src="./assets/updategame.png" alt="updating a game" width="450" height= "300">
+            <img src="./assets/updategame.png" alt="updating a game" width="400" height= "300">
             <p>update game view</p>
         </div>
         <div style="text-align: center;">
@@ -73,22 +73,22 @@
     <h3>Profile</h3>
     <div style="display: flex; align-items: center;">
         <div style="margin-right: 20px; text-align: center;">
-            <img src="./assets/userprofile.png" alt="profile page" width="450" height= "300">
+            <img src="./assets/userprofile.png" alt="profile page" width="400" height= "300">
             <p>profile page</p>
         </div>
         <div style="text-align: center;">
-            <img src="./assets/updateprofile.png" alt="updating user profile" width="450" height= "300">
+            <img src="./assets/updateprofile.png" alt="updating user profile" width="400" height= "300">
             <p>user update profile view</p>
         </div>
     </div>
     <h3>Admin Control</h3>
     <div style="display: flex; align-items: center;">
         <div style="margin-right: 20px; text-align: center;">
-            <img src="./assets/control.png" alt="admin page" width="450" height= "300">
+            <img src="./assets/control.png" alt="admin page" width="400" height= "300">
             <p>admin control page</p>
         </div>
         <div style="text-align: center;">
-            <img src="./assets/adminupdate.png" alt="updating user profile" width="450" height= "300">
+            <img src="./assets/adminupdate.png" alt="updating user profile" width="400" height= "300">
             <p>update user profile by admin view</p>
         </div>
     </div>
