@@ -663,7 +663,7 @@ const Play = () => {
                         >
                             <KeyboardDoubleArrowLeftIcon />
                         </Button>
-                        <h4>Organise Tennis Game</h4>
+                        <h4>Update Tennis Game</h4>
                     </Box>
 
                     <Typography variant="h6" sx={{ marginBottom: "0" }}>
